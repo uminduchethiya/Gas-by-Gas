@@ -2,6 +2,8 @@
 
 use App\Consts\UserRoleConst;
 use App\Http\Controllers\AdminDashboard;
+use App\Http\Controllers\ManagerDashboard;
+use App\Http\Controllers\TokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -34,11 +36,16 @@ Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function (
 Route::middleware(['auth:web'])->group(function () {
     // Admin Dashboard route
     Route::middleware('role:' . UserRoleConst::ADMIN)->group(function () {
-        Route::get('/dashboard', [AdminDashboard::class, 'dashboard_view'])->name('dashboard');
+        Route::get('/admin/dashboard', [AdminDashboard::class, 'dashboard_view'])->name('admin.dashboard');
     });
 
     // Manager Dashboard route
-    Route::middleware('role:' . UserRoleConst::MANAGER)->group(function () {
-        Route::get('/dashboard', [AdminDashboard::class, 'dashboard_view'])->name('manager.dashboard');
+    Route::prefix('manager')
+    ->middleware(['auth', 'role:' . UserRoleConst::MANAGER])
+    ->name('manager.')
+    ->group(function () {
+        Route::get('/dashboard', [ManagerDashboard::class, 'index'])->name('dashboard');
+        Route::get('/tokens', [TokenController::class, 'index'])->name('tokens.index');
+
     });
 });
