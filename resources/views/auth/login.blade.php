@@ -15,13 +15,22 @@
         }
 
         @keyframes gradientBackground {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         /* Logo and Form Slide-in Animation */
-        .animated-logo, .animated-form {
+        .animated-logo,
+        .animated-form {
             opacity: 0;
             transform: translateY(-20px);
             animation: slideDown 1s ease forwards;
@@ -43,22 +52,27 @@
 
 <body class="flex items-center justify-center min-h-screen bg-main-bg font-mono">
     <!-- Login Container -->
-    <div class="w-full max-w-md p-8 space-y-6 bg-secondary-bg rounded-lg shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105">
+    <div
+        class="w-full max-w-md p-8 space-y-6 bg-secondary-bg rounded-lg shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105">
         <!-- Branding / Logo -->
         <div class="text-center animated-logo">
-            <h2 class="text-3xl font-bold text-text-primary">Selcome Billing</h2>
-            <p class="text-text-secondary">Admin Panel Login</p>
+            <h2 class="text-3xl font-bold text-text-primary">Gas By Gas</h2>
+            <p class="text-text-secondary">User Login</p>
         </div>
 
         <!-- Login Form -->
-        <form class="space-y-4 animated-form">
-           
+        <form method="POST" action="{{ route('login.api') }}" class="space-y-4 animated-form">
+            @csrf 
             <!-- Email Input -->
             <div>
                 <label for="email" class="block text-sm font-medium text-text-secondary">Email Address</label>
-                <input type="email" id="email" name="email" required
-                    class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg"
-                    placeholder="admin@selcome.com">
+                <input type="email" id="email" name="email" required value="{{ old('email') }}"
+                class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg"
+                placeholder="admin@selcome.com">
+                @error('email')
+                    <!-- Display error message for email field -->
+                    <span class="text-sm text-red-500">{{ $message }}</span>
+                @enderror
             </div>
 
             <!-- Password Input -->
@@ -67,15 +81,11 @@
                 <input type="password" id="password" name="password" required
                     class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg"
                     placeholder="••••••••">
+                @error('password')
+                    <!-- Display error message for password field -->
+                    <span class="text-sm text-red-500">{{ $message }}</span>
+                @enderror
             </div>
-
-            <!-- Remember Me Checkbox -->
-            <div class="flex items-center">
-                <input type="checkbox" id="remember" name="remember"
-                    class="w-4 h-4 text-accent-1 border-accent-2 rounded focus:ring-accent-1">
-                <label for="remember" class="ml-2 text-sm text-text-secondary">Remember me</label>
-            </div>
-
             <!-- Login Button -->
             <div>
                 <button type="submit"
@@ -83,12 +93,22 @@
                     Log In
                 </button>
             </div>
+
+            <!-- Forgot Password Link -->
+            {{-- <div class="text-center">
+                <a href="{{ route('password.request') }}" class="text-sm text-accent-1 hover:text-accent-2">
+                    Forgot your password?
+                </a>
+            </div> --}}
         </form>
 
 
         <!-- Forgot Password Link -->
         <div class="text-center">
             <a href="#" class="text-sm text-accent-1 hover:underline">Forgot your password?</a>
+        </div>
+        <div class="text-center">
+            <a href="/register-view" class="text-sm text-accent-1 hover:underline">Register</a>
         </div>
     </div>
 </body>
