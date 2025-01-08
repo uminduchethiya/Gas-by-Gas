@@ -1,45 +1,205 @@
-
-<!-- resources/views/manager/dashboard.blade.php -->
 @extends('manager.layout')
 
 @section('content')
 <main class="flex-1 p-6 overflow-auto">
-      
+    <!-- Table Example -->
+    <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+                <div class="mb-4">
+        <form action="{{ route('manager.tokens.index') }}" method="GET" id="filterForm" class="flex items-center space-x-4">
+            
+            <!-- Search Input -->
+            <div class="flex items-center space-x-2">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search tokens..." class="px-3 py-1 border border-gray-300 rounded-md w-64">
+                <button type="submit" class="px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600">Search</button>
+            </div>    
+            <!-- Status Dropdown -->
+            <select name="status" class="px-3 py-1 border border-gray-300 rounded-md w-56" id="statusSelect">
+                <option value="">All Statuses</option>
+                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                <option value="scheduled" {{ request('status') === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                <option value="delivered" {{ request('status') === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                <option value="canceled" {{ request('status') === 'canceled' ? 'selected' : '' }}>Canceled</option>
+                <option value="reassigned" {{ request('status') === 'reassigned' ? 'selected' : '' }}>Reassigned</option>
+                <option value="cylinder_received" {{ request('status') === 'cylinder_received' ? 'selected' : '' }}>Cylinder Received</option>
+                <option value="payment_complete" {{ request('status') === 'payment_complete' ? 'selected' : '' }}>Payment Complete</option>
+            </select>
+        </form>
+        </div>
 
-            <!-- Table Example -->
-            <div class="mt-6 bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">Recent Activities</h2>
-                <table class="w-full text-sm text-left text-gray-500">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-200">
-                        <tr>
-                            <th scope="col" class="px-4 py-2">#</th>
-                            <th scope="col" class="px-4 py-2">User</th>
-                            <th scope="col" class="px-4 py-2">Activity</th>
-                            <th scope="col" class="px-4 py-2">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="bg-white border-b">
-                            <td class="px-4 py-2">1</td>
-                            <td class="px-4 py-2">John Doe</td>
-                            <td class="px-4 py-2">Created a new report</td>
-                            <td class="px-4 py-2">2024-01-06</td>
-                        </tr>
-                        <tr class="bg-white border-b">
-                            <td class="px-4 py-2">2</td>
-                            <td class="px-4 py-2">Jane Smith</td>
-                            <td class="px-4 py-2">Updated user permissions</td>
-                            <td class="px-4 py-2">2024-01-05</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-@endsection
-
-
-        <!-- Content Section -->
+        <!-- Table for Recent Activities -->
+        <table class="w-full text-sm text-left text-gray-500 mt-6">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                <tr>
+                    <th class="px-4 py-2">
+                        <a href="{{ route('manager.tokens.index', array_merge(request()->query(), ['sort_by' => 'id', 'sort_direction' => request('sort_direction') === 'asc' ? 'desc' : 'asc'])) }}" class="flex items-center space-x-1">
+                            <span>Token ID</span>
+                            @if (request('sort_by') === 'id')
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th class="px-4 py-2">
+                        <a href="{{ route('manager.tokens.index', array_merge(request()->query(), ['sort_by' => 'status', 'sort_direction' => request('sort_direction') === 'asc' ? 'desc' : 'asc'])) }}" class="flex items-center space-x-1">
+                            <span>Status</span>
+                            @if (request('sort_by') === 'status')
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th class="px-4 py-2">Description</th>
+                    <th class="px-4 py-2">Gas Cylinder Type</th>
+                    <th class="px-4 py-2">User</th>
+                    <th class="px-4 py-2">
+                        <a href="{{ route('manager.tokens.index', array_merge(request()->query(), ['sort_by' => 'created_at', 'sort_direction' => request('sort_direction') === 'asc' ? 'desc' : 'asc'])) }}" class="flex items-center space-x-1">
+                            <span>Created At</span>
+                            @if (request('sort_by') === 'created_at')
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th class="px-4 py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($tokens as $token)
+                    <tr>
+                        <td class="px-4 py-2">{{ $token->id }}</td>
+                        <td class="px-4 py-2">{{ $token->status }}</td>
+                        <td class="px-4 py-2">{{ $token->description }}</td>
+                        <td class="px-4 py-2">{{ $token->gas_cylinder_name ?? 'N/A' }}</td>
+                        <td class="px-4 py-2">{{ $token->user_name }}</td>
+                        <td class="px-4 py-2">{{ $token->created_at->format('Y-m-d H:i') }}</td>
+                        <td class="px-4 py-2">
+                            <button onclick="openModal({{ $token->id }})"
+                                    class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center px-4 py-2">No tokens found.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+        <div class="mt-4">
+        <div class="mt-4 flex items-center justify-between">
+    <span class="text-sm text-gray-700">
+        Showing page {{ $tokens->currentPage() }} of {{ $tokens->lastPage() }} pages
+    </span>
     
+    <div>
+        {{ $tokens->links('pagination::tailwind') }}
+    </div>
+</div>
+    </div>
 
-        <!-- Footer -->
-       
+</main>
+
+<!-- Modal Popup -->
+<div id="tokenModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
+        <h2 class="text-xl font-bold mb-4">Token Details</h2>
+        <div>
+            <strong>Token ID:</strong> <span id="modalTokenId"></span>
+        </div>
+        <div>
+            <strong>Status:</strong> <span id="modalTokenStatus"></span>
+        </div>
+        <div>
+            <strong>Is Active:</strong> <span id="modalTokenIsActive"></span>
+        </div>
+        <div>
+            <strong>Description:</strong> <span id="modalTokenDescription"></span>
+        </div>
+        <div>
+            <strong>User ID:</strong> <span id="modalTokenUserId"></span>
+        </div>
+        <div class="mt-4">
+            <label for="updateStatus" class="block font-medium text-gray-700">Update Status</label>
+            <select id="updateStatus" class="w-full border-gray-300 rounded-md shadow-sm">
+                <option value="pending">pending</option>
+                <option value="scheduled">scheduled</option>
+                <option value="Completed">Completed</option>
+                <option value="delivered">Delivered</option>
+
+                <option value="canceled">Canceled</option>
+
+                <option value="reasigned">Reasigned</option>
+
+                <option value="cylinder_received">Cylinder received</option>
+                <option value="payment_complete">payment_complete</option>
+
+
+
+            </select>
+        </div>
+        <div class="mt-4 flex justify-end">
+            <button onclick="updateTokenStatus()" 
+                    class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 mr-2">
+                Save
+            </button>
+            <button onclick="closeModal()" 
+                    class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentTokenId;
+
+    // Open Modal and Populate Data
+    function openModal(token) {
+        currentTokenId = token.id;
+        document.getElementById('modalTokenId').innerText = token.id;
+        document.getElementById('modalTokenStatus').innerText = token.status;
+        document.getElementById('modalTokenIsActive').innerText = token.isActive ? 'Yes' : 'No';
+        document.getElementById('modalTokenDescription').innerText = token.description;
+        document.getElementById('modalTokenUserId').innerText = token.user_id;
+        document.getElementById('updateStatus').value = token.status;
+        document.getElementById('tokenModal').classList.remove('hidden');
+    }
+
+    // Close Modal
+    function closeModal() {
+        document.getElementById('tokenModal').classList.add('hidden');
+    }
+
+    // Update Token Status via AJAX
+    async function updateTokenStatus() {
+        const status = document.getElementById('updateStatus').value;
+
+        const response = await fetch(`/manager/tokens/${currentTokenId}/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ status })
+        });
+
+        if (response.ok) {
+            alert('Token status updated successfully');
+            window.location.reload();
+        } else {
+            alert('Failed to update token status');
+        }
+
+        closeModal();
+    }
+</script>
+<script>
+     document.getElementById('statusSelect').addEventListener('change', function() {
+        document.getElementById('filterForm').submit();
+    });
+</script>
+@endsection

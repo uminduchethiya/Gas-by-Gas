@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('tokens', function (Blueprint $table) {
@@ -24,15 +21,21 @@ return new class extends Migration
             ])->default('pending');
             $table->boolean('isActive')->default(true);
             $table->string('description')->nullable();
-            $table->unsignedBigInteger('user_id');
+
+            $table->unsignedBigInteger('user_id'); 
+            $table->unsignedBigInteger('cylinder_type_id'); 
+            $table->unsignedBigInteger('branch_id'); 
+            
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('cylinder_type_id')->references('id')->on('gas_cylinders')->onDelete('cascade');
+            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
+
             $table->timestamps();
+
+        
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('tokens');

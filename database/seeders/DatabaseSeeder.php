@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             UserRoleSeeder::class,
             UserSeeder::class,
-         ]);
+            GasCylinderSeeder::class,
+
+        ]);
     }
 }
