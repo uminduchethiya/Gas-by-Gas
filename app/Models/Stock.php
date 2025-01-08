@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Stock extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'branch_id',
+        'gas_cylinder_id',
+        'quantity',
+        'isActive',
+    ];
+
+    // Define relationship with Branch
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    // Define relationship with GasCylinder
+    public function gasCylinder()
+    {
+        return $this->belongsTo(GasCylinder::class);
+    }
+}

@@ -46,6 +46,8 @@ Route::middleware(['auth:web'])->group(function () {
     ->group(function () {
         Route::get('/dashboard', [ManagerDashboard::class, 'index'])->name('dashboard');
         Route::get('/tokens', [TokenController::class, 'index'])->name('tokens.index');
+        Route::post('/tokens/{id}/update', [TokenController::class, 'update'])->name('tokens.update');
+
 
     });
 });
