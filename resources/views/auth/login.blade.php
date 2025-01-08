@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selcome Admin Login</title>
+    <title>GAS BY GAS USER LOGIN</title>
     @vite('resources/css/app.css')
     <style>
         /* Background Gradient Animation */
@@ -68,7 +68,7 @@
                 <label for="email" class="block text-sm font-medium text-text-secondary">Email Address</label>
                 <input type="email" id="email" name="email" required value="{{ old('email') }}"
                 class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg"
-                placeholder="admin@selcome.com">
+                placeholder="admin@gmail.com">
                 @error('email')
                     <!-- Display error message for email field -->
                     <span class="text-sm text-red-500">{{ $message }}</span>

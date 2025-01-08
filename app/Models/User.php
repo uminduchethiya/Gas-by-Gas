@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'address',
+        'nic',
         'contact_number',
         'role_id',
         'branch_id',
