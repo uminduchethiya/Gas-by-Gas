@@ -33,7 +33,7 @@ class AuthController extends Controller
                     return redirect()->route('home')->with('status', 'Logged in successfully!');
                 }
                 if ($user->role_id == UserRoleConst::ADMIN) {
-                    return redirect()->route('dashboard')->with('status', 'Welcome to the dashboard!');
+                    return redirect()->route('admin.dashboard')->with('status', 'Welcome to the dashboard!');
                 }
                 if ($user->role_id == UserRoleConst::MANAGER) {
                     // Redirect manager to their specific dashboard
@@ -69,6 +69,7 @@ class AuthController extends Controller
                 'password' => 'required|string|min:8|confirmed',
                 'contact_number' => 'nullable|string',
                 'address' => 'nullable|string',
+                'nic'=>'nullable|string',
                 'branch' => 'required|exists:branches,id',
             ]);
 
@@ -86,6 +87,7 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
                 'contact_number' => $request->contact_number,
                 'address' => $request->address,
+                'nic'=>$request->nic,
                 'role_id' => UserRoleConst::USER,
                 'branch_id' => $request->branch,
             ]);
