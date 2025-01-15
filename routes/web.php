@@ -26,11 +26,12 @@ Route::get('/', function () {
 
 Route::get('/login-view', [AuthController::class, 'loginview'])->name('login');
 Route::get('/register-view', [AuthController::class, 'registeview'])->name('register.view');
-
-
+Route::get('/home', [UserController::class, 'home_view'])->name('home');
+Route::get('/aboutus',[UserController::class, 'aboutus_view'])->name('aboutus');
+Route::get('/contactus',[UserController::class, 'countacus_view'])->name('contactus');
 // Route group for USER role
 Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function () {
-    Route::get('/home', [UserController::class, 'home_view'])->name('home');
+    
 });
 
 Route::middleware(['auth:web'])->group(function () {
