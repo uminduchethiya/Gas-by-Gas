@@ -16,7 +16,7 @@
                                 capital can unlock long-term value and drive economic growth.</p>
                             <div class="flex space-x-4">
                                 <a href="#"
-                                    class="py-3 px-5 text-base font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">Get
+                                    class="py-3 px-5 text-base font-medium text-white bg-text-light rounded-lg hover:text-text-dark focus:ring-4 focus:ring-blue-300">Get
                                     started</a>
                                 <a href="#"
                                     class="py-3 px-5 text-base font-medium text-white border border-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-400">Learn
@@ -34,7 +34,7 @@
                                 sustainable and prosperous future for all.</p>
                             <div class="flex space-x-4">
                                 <a href="#"
-                                    class="py-3 px-5 text-base font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">Discover
+                                    class="py-3 px-5 text-base font-medium text-white bg-text-light rounded-lg hover:text-text-dark focus:ring-4 focus:ring-blue-300">Discover
                                     more</a>
                                 <a href="#"
                                     class="py-3 px-5 text-base font-medium text-white border border-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-400">Join
@@ -52,7 +52,7 @@
                                 potential in a competitive world.</p>
                             <div class="flex space-x-4">
                                 <a href="#"
-                                    class="py-3 px-5 text-base font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">Learn
+                                    class="py-3 px-5 text-base font-medium text-white bg-text-light rounded-lg hover:text-text-dark focus:ring-4 focus:ring-blue-300">Learn
                                     more</a>
                                 <a href="#"
                                     class="py-3 px-5 text-base font-medium text-white border border-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-400">Get
@@ -68,9 +68,9 @@
                 class="section1 md:flex md:flex-wrap items-start gap-6 md:gap-12 p-6 bg-gradient-to-br from-gray-100 to-white font-boogaloo">
                 <!-- About Us Section -->
                 <section class="flex-1 p-6 md:p-10 order-2 md:order-1">
-                    <em class="text-yellow-500 text-2xl  font-bold uppercase tracking-wide block mb-4">About Us</em>
+                    <em class="text-text-light text-2xl  font-bold uppercase tracking-wide block mb-4">About Us</em>
                     <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-6 leading-tight">
-                        We Help You <span class="text-yellow-600">Keep Your Place Clean</span>
+                        We Help You <span class="text-text-dark">Keep Your Place Clean</span>
                     </h1>
                     <p class="text-gray-600 text-sm md:text-lg leading-relaxed mb-6">
                         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
@@ -130,77 +130,86 @@
             <div class="section2 font-boogaloo relative bg-cover bg-no-repeat text-white py-12 px-4 md:px-8"
                 style="background-image: linear-gradient(to right, rgba(31, 28, 88, 0.8) 10%, rgba(31, 28, 88, 0.8) 50%, rgba(31, 28, 88, 0.8) 100%),">
                 <h1 class="text-2xl p-6 md:text-4xl font-bold text-gray-800 mb-6 leading-tight">
-                    OUR <span class="text-yellow-600">PROCESS</span>
+                    OUR <span class="text-text-dark">PROCESS</span>
                 </h1>
                 <div class="flex flex-wrap md:flex-nowrap justify-center items-start p-6 gap-8">
                     <!-- Card 1 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#1F1C58] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
                             <img src="https://i.postimg.cc/J7yFYNtr/01.png" alt="Service"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                             <div class="absolute w-[90%] h-[50px] bg-contain bg-center bg-no-repeat top-[-20px] animate-bounce"
                                 style="background-image: url('https://i.postimg.cc/7LBXbLm6/arrow.png')"></div>
                         </figure>
-                        <h2 class="text-lg font-semibold mt-4 text-[#FFD700]">Pick a <em class="text-white">service</em>
+                        <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
+                            Pick a <em class="text-white">service</em>
                         </h2>
-                        <p class="text-gray-300 mt-2">Choose from our range of professional services tailored to meet your
+                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
                             needs.</p>
                     </div>
 
                     <!-- Card 2 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#1F1C58] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
                             <img src="https://i.postimg.cc/jSTkjBc2/02.png" alt="Schedule"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                             <div class="absolute w-[90%] h-[50px] bg-contain bg-center bg-no-repeat top-[-20px] animate-bounce"
                                 style="background-image: url('https://i.postimg.cc/7LBXbLm6/arrow.png')"></div>
                         </figure>
-                        <h2 class="text-lg font-semibold mt-4 text-[#FFD700]"><em class="text-white">Schedule</em> with us
+                        <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
+                            Pick a <em class="text-white">service</em>
                         </h2>
-                        <p class="text-gray-300 mt-2">Set up an appointment that fits perfectly into your schedule.</p>
+                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
+                            needs.</p>
                     </div>
 
                     <!-- Card 2 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#1F1C58] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
                             <img src="https://i.postimg.cc/jSTkjBc2/02.png" alt="Schedule"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                             <div class="absolute w-[90%] h-[50px] bg-contain bg-center bg-no-repeat top-[-20px] animate-bounce"
                                 style="background-image: url('https://i.postimg.cc/7LBXbLm6/arrow.png')"></div>
                         </figure>
-                        <h2 class="text-lg font-semibold mt-4 text-[#FFD700]"><em class="text-white">Schedule</em> with us
+                        <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
+                            Pick a <em class="text-white">service</em>
                         </h2>
-                        <p class="text-gray-300 mt-2">Set up an appointment that fits perfectly into your schedule.</p>
+                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
+                            needs.</p>
                     </div>
 
                     <!-- Card 2 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#1F1C58] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
                             <img src="https://i.postimg.cc/jSTkjBc2/02.png" alt="Schedule"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                             <div class="absolute w-[90%] h-[50px] bg-contain bg-center bg-no-repeat top-[-20px] animate-bounce"
                                 style="background-image: url('https://i.postimg.cc/7LBXbLm6/arrow.png')"></div>
                         </figure>
-                        <h2 class="text-lg font-semibold mt-4 text-[#FFD700]"><em class="text-white">Schedule</em> with us
+                        <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
+                            Pick a <em class="text-white">service</em>
                         </h2>
-                        <p class="text-gray-300 mt-2">Set up an appointment that fits perfectly into your schedule.</p>
+                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
+                            needs.</p>
                     </div>
 
 
                     <!-- Card 3 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#1F1C58] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
                             <img src="https://i.postimg.cc/FKsWyc2Q/03.png" alt="Done"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                         </figure>
-                        <h2 class="text-lg font-semibold mt-4 text-[#FFD700]">Get things <em class="text-white">done</em>
+                        <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
+                            Pick a <em class="text-white">service</em>
                         </h2>
-                        <p class="text-gray-300 mt-2">Sit back and relax while we handle the hard work for you.</p>
+                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
+                            needs.</p>
                     </div>
                 </div>
             </div>
@@ -224,9 +233,9 @@
 
                 <!-- Text Content Section -->
                 <section class="flex-1 space-y-6">
-                    <em class="text-sm text-yellow-600 font-bold uppercase tracking-wide">Why Choose Us?</em>
+                    <em class="text-sm text-text-dark font-bold uppercase tracking-wide">Why Choose Us?</em>
                     <h1 class="text-3xl font-extrabold text-gray-800 leading-tight">
-                        We Provide <span class="text-yellow-500">Top-notch Services</span> for Your Needs!
+                        We Provide <span class="text-text-light">Top-notch Services</span> for Your Needs!
                     </h1>
                     <p class="text-gray-600 text-lg">
                         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
@@ -235,17 +244,17 @@
                     </p>
                     <ul class="space-y-4">
                         <li class="flex items-start gap-3">
-                            <i class="fas fa-check-circle text-yellow-500 text-2xl"></i>
+                            <i class="fas fa-check-circle text-text-light text-2xl"></i>
                             <span class="text-gray-700 text-lg">Lorem Ipsum has been the industry's standard dummy text
                                 ever since the 1500s.</span>
                         </li>
                         <li class="flex items-start gap-3">
-                            <i class="fas fa-check-circle text-yellow-500 text-2xl"></i>
+                            <i class="fas fa-check-circle text-text-light text-2xl"></i>
                             <span class="text-gray-700 text-lg">When an unknown printer took a galley of type and scrambled
                                 it to make a type specimen book.</span>
                         </li>
                         <li class="flex items-start gap-3">
-                            <i class="fas fa-check-circle text-yellow-500 text-2xl"></i>
+                            <i class="fas fa-check-circle text-text-light text-2xl"></i>
                             <span class="text-gray-700 text-lg">It has survived not only five centuries but also the leap
                                 into electronic typesetting.</span>
                         </li>
@@ -257,15 +266,16 @@
             <div class="section5 font-boogaloo  relative">
                 <section
                     class="flex flex-col items-center justify-center py-12 px-6 md:px-12 rounded-xl bg-secondary_dark bg-cover bg-no-repeat bg-center relative overflow-hidden">
-                    <h1 class="text-2xl md:text-4xl items-center justify-center text-center  font-bold text-gray-800 mb-6 leading-tight">
-                        Stay connected with<span class="text-yellow-600"> US</span>
-                    <p class="text-black mb-6 text-lg md:text-xl max-w-xl text-center">
-                        Have any questions? Feel free to contact us. We are always happy to hear from you.
-                    </p>
-                    <a href="#"
-                        class="btn1 px-6 py-3 border-2 border-black text-black text-lg font-medium rounded-lg transition-all duration-300 ease-in-out  hover:text-secondary_dark">
-                        Contact us
-                    </a>
+                    <h1
+                        class="text-2xl md:text-4xl items-center justify-center text-center  font-bold text-gray-800 mb-6 leading-tight">
+                        Stay connected with<span class="text-text-dark"> US</span>
+                        <p class="text-black mb-6 text-lg md:text-xl max-w-xl text-center">
+                            Have any questions? Feel free to contact us. We are always happy to hear from you.
+                        </p>
+                        <a href="/contactus"
+                            class="btn1 px-6 py-3 border-2 border-black text-black text-lg font-medium rounded-lg transition-all duration-300 ease-in-out  hover:text-secondary_dark">
+                            Contact us
+                        </a>
                 </section>
 
                 <!-- Decorative image (adjust position for better UX) -->
@@ -342,7 +352,7 @@
                     }
 
                     // Automatically cycle through images every 5 seconds
-                    setInterval(showNextImage, 5000);
+                    setInterval(showNextImage, 10000);
                 });
             </script>
         </main>
