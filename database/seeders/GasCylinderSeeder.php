@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\GasCylinder;
+use App\Models\Outlet;
+use App\Models\OutletToken;
+use App\Consts\UserRoleConst;
+
 use Illuminate\Database\Seeder;
 
 class GasCylinderSeeder extends Seeder
@@ -40,9 +44,21 @@ class GasCylinderSeeder extends Seeder
                 'isActive' => true, 
             ],
         ];
+        $activeOutlets = Outlet::where('Status', 'Active')->get();
 
         foreach ($cylinders as $cylinder) {
-            GasCylinder::create($cylinder);
+            $cylinder = GasCylinder::create($cylinder);
+
+
+            foreach ($activeOutlets as $outlet) {
+                OutletToken::create([
+                    'OutletID' => $outlet->OutletID,
+                    'gas_cylinder_id' => $cylinder->id,
+                    'maxTokens' => config('tokens.DEFAULT_TOKEN_LIMIT', 100), 
+                    'currentTokens' =>config('tokens.DEFAULT_TOKEN_LIMIT', 100),
+                    'token_amount' => config('tokens.DEFAULT_TOKEN_LIMIT', 100),
+                ]);
+            }
         }
     }
 }

@@ -47,4 +47,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function outlets()
+    {
+        return $this->hasMany(Outlet::class, 'UserID'); // Adjust the foreign key if needed
+    }
+    
 }

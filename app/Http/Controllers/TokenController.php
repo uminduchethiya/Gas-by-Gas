@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Token;
+use App\Models\TokenHistory;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TokenController extends Controller
 {
@@ -44,13 +47,37 @@ class TokenController extends Controller
         {
             $request->validate([
                 'status' => 'required|string',
+                'reason' => 'nullable|string', // Reason is required only for specific statuses
             ]);
-            $token = Token::findOrFail($id);
-           
-            $token->status = $request->status;
-            $token->save();
-
-            return response()->json(['message' => 'Token status updated successfully']);
+        
+            DB::beginTransaction();
+        
+            try {
+                $token = Token::findOrFail($id);
+        
+                if ($request->status === Token::STATUS_CANCELED && empty($request->reason)) {
+                    return response()->json(['error' => 'A reason is required when canceling a token'], 422);
+                }
+        
+                // Log current status in token history
+                TokenHistory::create([
+                    'token_id' => $token->id,
+                    'currentStatus' => $token->status,
+                    'updateStatus' => $request->status,
+                    'reason' => $request->reason ?? null,
+                    'updated_by' => Auth::id(),
+                ]);
+        
+                // Update token status
+                $token->status = $request->status;
+                $token->save();
+        
+                DB::commit();
+        
+                return response()->json(['message' => 'Token status updated successfully']);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['error' => 'Failed to update token status', 'details' => $e->getMessage()], 500);
+            }
         }
-
 }

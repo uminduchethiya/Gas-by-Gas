@@ -3,7 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\Branch;
+use App\Models\User;
+use App\Models\Outlet;
+
+
 use Illuminate\Database\Seeder;
+use App\Consts\UserRoleConst;
+
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class BranchSeeder extends Seeder
@@ -41,10 +47,34 @@ class BranchSeeder extends Seeder
             ['name' => 'Kegalle', 'province' => 'Sabaragamuwa Province'],
         ];
 
-        // Using the Branch model to insert data
         foreach ($districts as $district) {
-            Branch::create($district);
-        }
+            $branch =  Branch::create($district);
 
+
+            $user = User::create([
+                'name' => $district['name'] . ' User',
+                'email' =>  strtolower($district['name']) . '@example.com',
+                'password' => bcrypt(config('app.MANAGER_DEFAULT_PASSWORD')),
+                'role_id' => UserRoleConst::MANAGER,
+                'branch_id' => $branch->id,  
+                'address' => $district['province'],
+                'contact_number' => '1234567890',
+            ]);
+
+            Outlet::create([
+                'branch_id' => $branch->id,
+                'UserID' => $user->id, 
+                'Name' => $district['name'] . ' Outlet',
+                'Address' => $district['name'] . ' Address',
+                'ContactNumber' => '0712345678',
+                'Email' => strtolower($district['name']) . '@outlet.com',
+                'Latitude' => 6.9271, 
+                'Longitude' => 79.8612, 
+                'Status' => 'Active',
+            ]);
+        }
+        
     }
+
+    
 }
