@@ -4,5 +4,8 @@
     <ul class="space-y-3">
     <a href="{{ route('manager.dashboard') }}" class="block hover:bg-accent-1 p-2 rounded">Dashboard</a>
     <a href="{{ route('manager.tokens.index') }}" class="block hover:bg-accent-1 p-2 rounded">Token Management</a>
+    <a href="{{ route('manager.DeliveryPlan.indexManager') }}" class="block hover:bg-accent-1 p-2 rounded">Delivery Plan</a>
+
+    
     </ul>
 </div>

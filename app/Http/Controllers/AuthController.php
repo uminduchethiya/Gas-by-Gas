@@ -33,7 +33,7 @@ class AuthController extends Controller
                     return redirect()->route('home')->with('status', 'Logged in successfully!');
                 }
                 if ($user->role_id == UserRoleConst::ADMIN) {
-                    return redirect()->route('dashboard')->with('status', 'Welcome to the dashboard!');
+                    return redirect()->route('admin.dashboard')->with('status', 'Welcome to the dashboard!');
                 }
                 if ($user->role_id == UserRoleConst::MANAGER) {
                     // Redirect manager to their specific dashboard

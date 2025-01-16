@@ -13,6 +13,14 @@ class Token extends Model
         'status', 'description', 'user_id', 'cylinder_type_id', 'branch_id'
     ];
 
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_SCHEDULED = 'scheduled';
+    public const STATUS_DELIVERED = 'delivered';
+    public const STATUS_CANCELED = 'canceled';
+    public const STATUS_REASIGNED = 'reasigned';
+    public const STATUS_CYLINDER_RECEIVED = 'cylinder_received';
+    public const STATUS_PAYMENT_COMPLETE = 'payment_complete';
+
     // Define the relationship with the User model
     public function user()
     {
