@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Token;
-use App\Models\User;
 use App\Models\GasCylinder;
+use App\Models\Outlet;
 use App\Models\OutletToken;
-
+use App\Models\Token;
 use App\Models\TokenHistory;
 
+use App\Models\User;
+
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 class TokenController extends Controller
 {
 
@@ -51,7 +53,6 @@ class TokenController extends Controller
         $gasCylinders = GasCylinder::all();
 
         return view('manager.token.index', ['tokens' => $tokens, 'users' => $users, 'gasCylinders' => $gasCylinders]);
-
     }
 
     public function update(Request $request, $id)
@@ -167,7 +168,6 @@ class TokenController extends Controller
             DB::commit();
 
             return response()->json(['success' => 'Token issued successfully.', 'token' => $token], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -183,4 +183,22 @@ class TokenController extends Controller
         }
     }
 
+    public function tokenView()
+    {  
+        // Fetch all outlets
+        $outlets = Outlet::all();
+    
+        // Fetch all active gas cylinders
+        $gasCylinders = GasCylinder::where('isActive', true)->get();
+    
+        // Get the logged-in user's ID
+        $loggedInUserId = auth()->id();
+    
+        // Assume `auth()->user()->outlet_id` holds the currently assigned outlet for the user
+        $assignedOutletId = auth()->user()->outlet_id;
+    
+        return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId'));
+    }
+    
+    
 }
