@@ -2,6 +2,7 @@
 
 use App\Consts\UserRoleConst;
 use App\Http\Controllers\AdminDashboard;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ManagerDashboard;
 use App\Http\Controllers\OutletTokenController;
 use App\Http\Controllers\TokenController;
@@ -85,7 +86,11 @@ Route::middleware(['auth:web'])->group(function () {
             Route::get('/DeliveryPlan', action: [DeliveryPlanController::class, 'indexManager'])->name('DeliveryPlan.indexManager');
             Route::put('/DeliveryPlanManager/{id}', action: [DeliveryPlanController::class, 'updateManager'])->name(name: 'DeliveryPlan.updateManager');
 
+            Route::get('/customer', [CustomerController::class, 'index'])->name('customer.index');
+            Route::post('/customer', [CustomerController::class, 'store'])->name('customer.store');
+            Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
 
+            Route::get('/CoparateCustomers', [CustomerController::class, 'Coparateindex'])->name('CoparateCustomers.Coparateindex');
 
 
 
