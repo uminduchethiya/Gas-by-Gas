@@ -61,7 +61,8 @@
         </div>
 
         <!-- Login Form -->
-        <form method="POST" action="{{ route('register.api') }}" class="space-y-4 animated-form">
+        <form method="POST" action="{{ route('register.api') }}" class="space-y-4 animated-form"
+            enctype="multipart/form-data">
             @csrf
             <!-- Name Input -->
             <div>
@@ -132,6 +133,22 @@
                 </select>
             </div>
 
+            <!-- Organization Checkbox -->
+            <div class="flex items-center">
+                <input type="checkbox" id="is-organization" name="is_organization" value="1" class="mr-2"
+                    onclick="toggleVerificationFile()">
+                <label for="is-organization" class="text-sm font-medium text-text-secondary">Are you an
+                    organization?</label>
+            </div>
+
+            <!-- Verification File Input -->
+            <div id="verification-file-container" class="hidden">
+                <label for="verification-file" class="block text-sm font-medium text-text-secondary">Verification
+                    File</label>
+                <input type="file" id="verification-file" name="verification_file"
+                    class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg">
+            </div>
+
             <!-- Register Button -->
             <div>
                 <button type="submit"
@@ -139,15 +156,23 @@
                     Register
                 </button>
             </div>
+            <script>
+                function toggleVerificationFile() {
+                    const checkbox = document.getElementById('is-organization');
+                    const fileContainer = document.getElementById('verification-file-container');
+                    if (!checkbox.checked) {
+                        document.getElementById('verification-file').value = ''; // Clear file input if unchecked
+                    }
+                    fileContainer.classList.toggle('hidden', !checkbox.checked);
+                }
+            </script>
         </form>
-
-
-
         <!-- Forgot Password Link -->
         <div class="text-center">
             <a href="/login-view" class="text-sm text-accent-1 hover:underline">Login</a>
         </div>
     </div>
+
 </body>
 
 </html>

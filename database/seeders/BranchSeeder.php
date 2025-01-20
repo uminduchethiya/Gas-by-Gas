@@ -51,27 +51,28 @@ class BranchSeeder extends Seeder
             $branch =  Branch::create($district);
 
 
-            $user = User::create([
-                'name' => $district['name'] . ' User',
-                'email' =>  strtolower($district['name']) . '@example.com',
-                'password' => bcrypt(config('app.MANAGER_DEFAULT_PASSWORD')),
-                'role_id' => UserRoleConst::MANAGER,
-                'branch_id' => $branch->id,  
-                'address' => $district['province'],
-                'contact_number' => '1234567890',
-            ]);
+            // $user = User::create([
+            //     'name' => $district['name'] . ' User',
+            //     'email' =>  strtolower($district['name']) . '@example.com',
+            //     'password' => bcrypt(config('app.MANAGER_DEFAULT_PASSWORD')),
+            //     'role_id' => UserRoleConst::MANAGER,
+            //     'branch_id' => $branch->id,  
+            //     'address' => $district['province'],
+            //     'contact_number' => '1234567890',
+            //     'nic' => '123456428',
+            // ]);
 
-            Outlet::create([
-                'branch_id' => $branch->id,
-                'UserID' => $user->id, 
-                'Name' => $district['name'] . ' Outlet',
-                'Address' => $district['name'] . ' Address',
-                'ContactNumber' => '0712345678',
-                'Email' => strtolower($district['name']) . '@outlet.com',
-                'Latitude' => 6.9271, 
-                'Longitude' => 79.8612, 
-                'Status' => 'Active',
-            ]);
+            // Outlet::create([
+            //     'branch_id' => $branch->id,
+            //     'UserID' => $user->id, 
+            //     'Name' => $district['name'] . ' Outlet',
+            //     'Address' => $district['name'] . ' Address',
+            //     'ContactNumber' => '0712345678',
+            //     'Email' => strtolower($district['name']) . '@outlet.com',
+            //     'Latitude' => 6.9271, 
+            //     'Longitude' => 79.8612, 
+            //     'Status' => 'Active',
+            // ]);
         }
         
     }
