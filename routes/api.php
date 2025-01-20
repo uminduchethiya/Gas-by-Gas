@@ -27,3 +27,4 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.api');
 Route::post('/issue-token', [TokenController::class, 'issueToken'])->name('api.issueToken');
 
 Route::get('/token-history/{id}', [TokenController::class, 'getTokenHistoryByID']);
+

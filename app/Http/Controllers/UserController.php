@@ -17,4 +17,6 @@ class UserController extends Controller
     public function countacus_view(){
         return view('user.contactus');
     }
+
+    
 }

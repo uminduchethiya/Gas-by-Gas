@@ -9,7 +9,7 @@
         <div class="hidden md:flex items-center gap-10 text-xl">
             <a href="/home" class="text-black hover:text-primaryColor">Home</a>
             <a href="/aboutus" class="text-black hover:text-primaryColor">About</a>
-            <a href="#" class="text-black hover:text-primaryColor">Menu</a>
+            <a href="/token-view" class="text-black hover:text-primaryColor">Token Request</a>
             <a href="/contactus" class="text-black hover:text-primaryColor">Contact</a>
             <a href="#" class="text-black hover:text-primaryColor">Dealers</a>
         </div>

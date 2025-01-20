@@ -34,6 +34,7 @@ Route::get('/register-view', [AuthController::class, 'registeview'])->name('regi
 Route::get('/home', [UserController::class, 'home_view'])->name('home');
 Route::get('/aboutus',[UserController::class, 'aboutus_view'])->name('aboutus');
 Route::get('/contactus',[UserController::class, 'countacus_view'])->name('contactus');
+Route::get('/token-view',[TokenController::class, 'tokenView'])->name('tokenview');
 // Route group for USER role
 Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function () {
     
