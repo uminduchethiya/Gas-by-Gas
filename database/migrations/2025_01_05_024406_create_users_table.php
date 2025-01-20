@@ -32,6 +32,8 @@ return new class extends Migration
 
             $table->unsignedBigInteger('role_id');
             $table->unsignedBigInteger('outlet_id')->nullable();
+            $table->enum('status', ['active', 'deactive'])->default('active'); 
+
 
             $table->foreign('role_id')->references('id')->on('user_roles')->onDelete('cascade');
             $table->foreign('outlet_id')->references('id')->on('outlets')->onDelete('cascade');

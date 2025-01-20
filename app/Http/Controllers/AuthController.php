@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Consts\UserRoleConst;
 use App\Http\Controllers\Controller;
-use App\Models\Branch;
+use App\Models\Outlet;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,8 +70,8 @@ class AuthController extends Controller
 
     public function registeview()
     {
-        $branches = Branch::all();
-        return view('auth.register', compact('branches'));
+        $outlets = Outlet::all();
+        return view('auth.register', compact('outlets'));
     }
 
     public function register(Request $request)
@@ -85,7 +85,7 @@ class AuthController extends Controller
                 'contact_number' => 'nullable|string',
                 'address' => 'nullable|string',
                 'nic' => 'nullable|string',
-                'branch' => 'required|exists:branches,id',
+                'outlet' => 'required|exists:outlets,id',
                 'is_organization' => 'sometimes|boolean',
                 'verification_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048|required_if:is_organization,true',
             ]);
@@ -115,7 +115,7 @@ class AuthController extends Controller
                 'address' => $request->address,
                 'nic' => $request->nic,
                 'role_id' => $isOrganization ? UserRoleConst::ORGANIZATION : UserRoleConst::USER,
-                'branch_id' => $request->branch,
+                'outlet_id' => $request->outlet,
                 'is_organization' => $isOrganization,
                 'verification_file' => $verificationFilePath,
                 'status' => $isOrganization ? 'deactive' : 'active', // Set status to 'deactive' for organizations

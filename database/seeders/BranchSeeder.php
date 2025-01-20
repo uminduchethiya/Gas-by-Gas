@@ -50,6 +50,7 @@ class BranchSeeder extends Seeder
         foreach ($districts as $district) {
             $branch =  Branch::create($district);
 
+            $uniqueNic = str_pad(rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
 
                 $user = User::create([
                     'name' => $district['name'] . ' Manager',
@@ -58,6 +59,7 @@ class BranchSeeder extends Seeder
                     'role_id' => UserRoleConst::MANAGER,
                     'address' => $district['province'],
                     'contact_number' => '1234567890',
+                    'nic' => $uniqueNic, // Assign the unique NIC value
                     'outlet_id' => null, // Temporarily null
                 ]);
     
@@ -71,6 +73,7 @@ class BranchSeeder extends Seeder
                     'Email' => strtolower($district['name']) . '@outlet.com',
                     'Latitude' => null,
                     'Longitude' => null,
+                   
                     'isActive' => true,
                 ]);
 
