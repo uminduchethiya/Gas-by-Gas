@@ -21,6 +21,9 @@ return new class extends Migration
             $table->string('nic')->unique();
             $table->unsignedBigInteger('role_id');
             $table->unsignedBigInteger('branch_id');
+            $table->boolean('is_organization')->default(false);
+            $table->string('verification_file')->nullable();
+            $table->enum('status', ['active', 'deactive'])->default('active'); 
             $table->foreign('role_id')->references('id')->on('user_roles')->onDelete('cascade');
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
             $table->timestamp('email_verified_at')->nullable();

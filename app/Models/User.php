@@ -26,7 +26,11 @@ class User extends Authenticatable
         'contact_number',
         'role_id',
         'branch_id',
+        'is_organization',
+        'verification_file',
+        'status',
     ];
+    
 
     /**
      * The attributes that should be hidden for serialization.

@@ -22,13 +22,28 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-
             $request->validate([
                 'email' => 'required|email',
                 'password' => 'required|string|min:8',
             ]);
+
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 $user = Auth::user();
+
+                // Check if the user's status is active
+                if ($user->status !== 'active') {
+                    Auth::logout(); // Log the user out if status is not active
+                    return back()->withErrors([
+                        'email' => 'Your account is not active. Please contact the admin.',
+                    ]);
+                }
+
+                // Check if the user is an organization, and prevent login
+                if ($user->role_id == UserRoleConst::ORGANIZATION) {
+                    return redirect()->route('home')->with('status', 'Logged in as Organization!');
+                }
+
+                // Redirect based on user role
                 if ($user->role_id == UserRoleConst::USER) {
                     return redirect()->route('home')->with('status', 'Logged in successfully!');
                 }
@@ -62,15 +77,17 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-
+            // Validate the request data
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8|confirmed',
                 'contact_number' => 'nullable|string',
                 'address' => 'nullable|string',
-                'nic'=>'nullable|string',
+                'nic' => 'nullable|string',
                 'branch' => 'required|exists:branches,id',
+                'is_organization' => 'sometimes|boolean',
+                'verification_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048|required_if:is_organization,true',
             ]);
 
             if ($validator->fails()) {
@@ -80,28 +97,39 @@ class AuthController extends Controller
                 ], 422);
             }
 
+            // Convert is_organization to a boolean
+            $isOrganization = filter_var($request->is_organization, FILTER_VALIDATE_BOOLEAN);
 
+            // Handle file upload if 'is_organization' is true and a file is provided
+            $verificationFilePath = null;
+            if ($isOrganization && $request->hasFile('verification_file')) {
+                $verificationFilePath = $request->file('verification_file')->store('verification_files', 'public');
+            }
+
+            // Create the user with status based on the organization
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'contact_number' => $request->contact_number,
                 'address' => $request->address,
-                'nic'=>$request->nic,
-                'role_id' => UserRoleConst::USER,
+                'nic' => $request->nic,
+                'role_id' => $isOrganization ? UserRoleConst::ORGANIZATION : UserRoleConst::USER,
                 'branch_id' => $request->branch,
+                'is_organization' => $isOrganization,
+                'verification_file' => $verificationFilePath,
+                'status' => $isOrganization ? 'deactive' : 'active', // Set status to 'deactive' for organizations
             ]);
 
-
-
+            // Return success response
             return redirect()->route('login')->with('status', 'Registration successful! Please log in.');
         } catch (\Exception $e) {
-
+            // Handle any exceptions
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred during registration. Please try again.',
                 'error' => $e->getMessage(),
-            ], 500); 
+            ], 500);
         }
     }
 }
