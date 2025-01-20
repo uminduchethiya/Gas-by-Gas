@@ -10,7 +10,7 @@ class Token extends Model
     use HasFactory;
 
     protected $fillable = [
-        'status', 'description', 'user_id', 'cylinder_type_id', 'branch_id'
+        'status', 'isActive','description', 'user_id', 'cylinder_type_id', 'outlet_id','quantity','expires_at','token_code','created_by','updated_by'
     ];
 
     public const STATUS_PENDING = 'pending';

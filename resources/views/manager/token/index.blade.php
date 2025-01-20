@@ -30,6 +30,11 @@
                         Payment Complete</option>
                 </select>
             </form>
+            <button onclick="openCreateTokenModal()"
+                class="px-4 py-1 bg-green-500 text-white rounded-md hover:bg-green-600">
+                Create Token
+            </button>
+
         </div>
 
         <!-- Table for Recent Activities -->
@@ -114,6 +119,51 @@
         </div>
 
 </main>
+<div id="createTokenModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
+        <!-- Header Section -->
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h2 class="text-2xl font-bold text-gray-800">Create Token</h2>
+            <button onclick="closeCreateTokenModal()"
+                class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+
+        <!-- Form Section -->
+        <form id="createTokenForm">
+            <div class="mb-4">
+                <label for="tokenUser" class="block font-medium text-gray-700 mb-1">Select User</label>
+                <select id="tokenUser" class="px-3 py-1 border border-gray-300 rounded-md w-full" required>
+                    <option value="" disabled selected>Select a user...</option>
+                    @foreach ($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="gasCylinderType" class="block font-medium text-gray-700 mb-1">Gas Cylinder Type</label>
+                <select id="gasCylinderType" class="px-3 py-1 border border-gray-300 rounded-md w-full" required>
+                    <option value="" disabled selected>Select a cylinder type...</option>
+                    @foreach ($gasCylinders as $cylinder)
+                        <option value="{{ $cylinder->id }}">{{ $cylinder->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-2 mt-4">
+                <button type="button" onclick="createToken()"
+                    class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+                    Create
+                </button>
+                <button type="button" onclick="closeCreateTokenModal()"
+                    class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div id="tokenModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
@@ -178,7 +228,14 @@
 
 <script>
     let currentTokenId;
+    function openCreateTokenModal() {
+        document.getElementById('createTokenModal').classList.remove('hidden');
+    }
 
+    // Close the Create Token Modal
+    function closeCreateTokenModal() {
+        document.getElementById('createTokenModal').classList.add('hidden');
+    }
     // Open Modal and Populate Data
     function openModal(token) {
         console.log(token.user_name)

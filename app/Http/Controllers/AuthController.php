@@ -132,4 +132,56 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function registerByAdmin(Request $request)
+    {
+        try {
+            // Validate the request data
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+                'contact_number' => 'nullable|string',
+                'address' => 'nullable|string',
+                'nic' => 'nullable|string|unique:users',
+                'outlet' => 'required|exists:outlets,id',
+                'is_organization' => 'sometimes|boolean',
+                'verification_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048|required_if:is_organization,true',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $isOrganization = filter_var($request->is_organization, FILTER_VALIDATE_BOOLEAN);
+
+            $verificationFilePath = null;
+            if ($isOrganization && $request->hasFile('verification_file')) {
+                $verificationFilePath = $request->file('verification_file')->store('verification_files', 'public');
+            }
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'contact_number' => $request->contact_number,
+                'address' => $request->address,
+                'nic' => $request->nic,
+                'role_id' => $isOrganization ? UserRoleConst::ORGANIZATION : UserRoleConst::USER,
+                'outlet_id' => $request->outlet,
+                'is_organization' => $isOrganization,
+                'verification_file' => $verificationFilePath,
+                'status' => $isOrganization ? 'deactive' : 'active', 
+            ]);
+
+            return response()->json(['success' => 'Customer created successfully!']);
+        } catch (\Exception $e) {
+            // Handle any exceptions
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
+    }
 }
