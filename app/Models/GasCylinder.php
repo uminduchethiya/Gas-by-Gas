@@ -17,6 +17,9 @@ class GasCylinder extends Model
         'size', 
         'isActive'
     ];
-
+    public function outletTokens()
+    {
+        return $this->hasMany(OutletToken::class, 'gas_cylinder_id');
+    }
    
 }

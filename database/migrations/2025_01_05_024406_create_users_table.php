@@ -17,13 +17,21 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('contact_number')->nullable();
-            $table->string('address')->nullable();;
-            $table->unsignedBigInteger('role_id');
-            $table->unsignedBigInteger('branch_id');
-            $table->foreign('role_id')->references('id')->on('user_roles')->onDelete('cascade');
-            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('address')->nullable();
+            $table->string('nic')->unique()->nullable();
+           
+
             $table->rememberToken();
+            $table->boolean('isActive')->default(true);
+            $table->timestamp('email_verified_at')->nullable();
+
+            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('outlet_id')->nullable();
+
+            $table->foreign('role_id')->references('id')->on('user_roles')->onDelete('cascade');
+            $table->foreign('outlet_id')->references('id')->on('outlets')->onDelete('cascade');
+        
+
             $table->timestamps();
         });
     }

@@ -11,18 +11,16 @@ class Outlet extends Model
 
     protected $table = 'outlets';
 
-    protected $primaryKey = 'OutletID';
-
     protected $fillable = [
         'branch_id',
-        'UserID',
-        'Name',
-        'Address',
+        'user_id', 
+        'name',
+        'address',
         'ContactNumber',
-        'Email',
-        'Latitude',
-        'Longitude',
-        'Status',
+        'email',
+        'latitude',
+        'longitude',
+        'isActive',
     ];
 
     
@@ -31,15 +29,15 @@ class Outlet extends Model
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
-   
+  
     public function user()
     {
-        return $this->belongsTo(User::class, 'UserID');
+        return $this->belongsTo(User::class, 'user_id'); 
     }
 
    
-    public function branchTokens()
+    public function outletTokens()
     {
-        return $this->hasMany(OutletToken::class, 'OutletID');
+        return $this->hasMany(OutletToken::class, 'outlet_id'); 
     }
 }

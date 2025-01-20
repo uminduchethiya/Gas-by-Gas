@@ -20,32 +20,12 @@ class UserSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => bcrypt(config('app.ADMIN_DEFAULT_PASSWORD')),
             'role_id' => UserRoleConst::ADMIN,
-            'branch_id' => 1,  
+            'outlet_id' => null,  
             'address' => 'Admin Address',
             'contact_number' => '1234567890',
         ]);
 
-        // Create a Manager user
-        User::create([
-            'name' => 'Manager User',
-            'email' => 'manager@example.com',
-            'password' => bcrypt(config('app.MANAGER_DEFAULT_PASSWORD')),
-            'role_id' => UserRoleConst::MANAGER,
-            'branch_id' => 1,
-            'address' => 'Manager Address',
-            'contact_number' => '1234567891',
-        ]);
-
-        // Create a Regular User
-        User::create([
-            'name' => 'Regular User',
-            'email' => 'user@example.com',
-            'password' => bcrypt(config('app.USER_DEFAULT_PASSWORD')),
-            'role_id' => UserRoleConst::USER,
-            'branch_id' => 1,
-            'address' => 'User Address',
-            'contact_number' => '1234567892',
-        ]);
+      
 
     }
 }

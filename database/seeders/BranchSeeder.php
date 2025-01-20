@@ -51,27 +51,40 @@ class BranchSeeder extends Seeder
             $branch =  Branch::create($district);
 
 
-            $user = User::create([
-                'name' => $district['name'] . ' User',
-                'email' =>  strtolower($district['name']) . '@example.com',
-                'password' => bcrypt(config('app.MANAGER_DEFAULT_PASSWORD')),
-                'role_id' => UserRoleConst::MANAGER,
-                'branch_id' => $branch->id,  
-                'address' => $district['province'],
-                'contact_number' => '1234567890',
+                $user = User::create([
+                    'name' => $district['name'] . ' Manager',
+                    'email' => strtolower($district['name']) . '@example.com',
+                    'password' => bcrypt(config('app.MANAGER_DEFAULT_PASSWORD')),
+                    'role_id' => UserRoleConst::MANAGER,
+                    'address' => $district['province'],
+                    'contact_number' => '1234567890',
+                    'outlet_id' => null, // Temporarily null
+                ]);
+    
+                // Step 3: Create Outlet
+                $outlet = Outlet::create([
+                    'branch_id' => $branch->id,
+                    'user_id' => $user->id, // Assign the user to the outlet
+                    'Name' => $district['name'] . ' Outlet',
+                    'Address' => $district['name'] . ' Address',
+                    'ContactNumber' => '0712345678',
+                    'Email' => strtolower($district['name']) . '@outlet.com',
+                    'Latitude' => null,
+                    'Longitude' => null,
+                    'isActive' => true,
+                ]);
+
+            // Step 4: Assign outlet_id to the User
+            $user->update([
+                'outlet_id' => $outlet->id,
             ]);
 
-            Outlet::create([
-                'branch_id' => $branch->id,
-                'UserID' => $user->id, 
-                'Name' => $district['name'] . ' Outlet',
-                'Address' => $district['name'] . ' Address',
-                'ContactNumber' => '0712345678',
-                'Email' => strtolower($district['name']) . '@outlet.com',
-                'Latitude' => 6.9271, 
-                'Longitude' => 79.8612, 
-                'Status' => 'Active',
+            // Step 5: Assign user_id to the Outlet
+            $outlet->update([
+                'user_id' => $user->id,
             ]);
+
+           
         }
         
     }

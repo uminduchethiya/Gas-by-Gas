@@ -23,17 +23,21 @@ return new class extends Migration {
             $table->text('Notes')->nullable();
             $table->boolean('isActive')->default(true);
 
+            $table->unsignedBigInteger('cylinder_type_id'); 
+            $table->unsignedBigInteger(column: 'outlet_id'); 
+
+
+
+            $table->foreign('cylinder_type_id')->references('id')->on('gas_cylinders')->onDelete('cascade');
+            $table->foreign('outlet_id')->references('id')->on('outlets')->onDelete('cascade');
+         
+
+
             $table->timestamps();
 
-            $table->foreignId('OutletID')->nullable()->constrained('outlets', 'OutletID')->onDelete('set null');
-
-            $table->foreignId('gas_cylinder_id')->nullable()->constrained('gas_cylinders')->onDelete('set null');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('delivery_plans');

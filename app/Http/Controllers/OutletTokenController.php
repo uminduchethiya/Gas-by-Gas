@@ -24,17 +24,16 @@ class OutletTokenController extends Controller
         $outletTokens = OutletToken::select(
             'outlet_tokens.id',
             'outlet_tokens.maxTokens',
-            'outlet_tokens.gas_cylinder_id',
+            'outlet_tokens.cylinder_type_id',
             'outlet_tokens.currentTokens',
-            'outlet_tokens.token_amount',
             'outlet_tokens.created_at',
             'outlets.name as branch_name',
-            'outlets.OutletID as OutletID',
+            'outlets.id as OutletID',
 
             'gas_cylinders.name as gas_cylinder_name'
         )
-            ->leftJoin('outlets', 'outlet_tokens.OutletID', '=', 'outlets.OutletID')
-            ->leftJoin('gas_cylinders', 'outlet_tokens.gas_cylinder_id', '=', 'gas_cylinders.id')
+            ->leftJoin('outlets', 'outlet_tokens.outlet_id', '=', 'outlets.id')
+            ->leftJoin('gas_cylinders', 'outlet_tokens.cylinder_type_id', '=', 'gas_cylinders.id')
             ->when($search, function ($query, $search) {
                 return $query->where(function ($query) use ($search) {
                     $query->where('outlet_tokens.token_amount', 'like', '%' . $search . '%')
@@ -66,18 +65,17 @@ class OutletTokenController extends Controller
     public function store(Request $request)
     {
         // Validate the form data
-
         $validated = $request->validate([
-            'outlet_id' => 'required|exists:outlets,OutletID',
+            'outlet_id' => 'required|exists:outlets,id',
             'gas_cylinder_id' => 'required|exists:gas_cylinders,id',
             'token_amount' => 'required|numeric',
         ]);
-        $existingToken = OutletToken::where('OutletID', $request->outlet_id)
-            ->where('gas_cylinder_id', $request->gas_cylinder_id)
-            ->where('gas_cylinder_id', $request->gas_cylinder_id)
 
+        $existingToken = OutletToken::where('outlet_id', $request->outlet_id)
+            ->where('cylinder_type_id', $request->gas_cylinder_id)
             ->first();
 
+          
         if ($existingToken) {
 
             return response()->json(['error' => 'This outlet already has this type of gas cylinder.'], 400);

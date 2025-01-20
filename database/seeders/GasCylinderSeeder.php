@@ -44,19 +44,17 @@ class GasCylinderSeeder extends Seeder
                 'isActive' => true, 
             ],
         ];
-        $activeOutlets = Outlet::where('Status', 'Active')->get();
-
+        $outlets = Outlet::all();
         foreach ($cylinders as $cylinder) {
             $cylinder = GasCylinder::create($cylinder);
 
 
-            foreach ($activeOutlets as $outlet) {
+            foreach ($outlets as $outlet) {
                 OutletToken::create([
-                    'OutletID' => $outlet->OutletID,
-                    'gas_cylinder_id' => $cylinder->id,
+                    'outlet_id' => $outlet->id,
+                    'cylinder_type_id' => $cylinder->id,
                     'maxTokens' => config('tokens.DEFAULT_TOKEN_LIMIT', 100), 
                     'currentTokens' =>config('tokens.DEFAULT_TOKEN_LIMIT', 100),
-                    'token_amount' => config('tokens.DEFAULT_TOKEN_LIMIT', 100),
                 ]);
             }
         }
