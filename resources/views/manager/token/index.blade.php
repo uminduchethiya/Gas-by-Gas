@@ -29,12 +29,14 @@
                     <option value="payment_complete" {{ request('status') === 'payment_complete' ? 'selected' : '' }}>
                         Payment Complete</option>
                 </select>
-            </form>
-            <button onclick="openCreateTokenModal()"
-                class="px-4 py-1 bg-green-500 text-white rounded-md hover:bg-green-600">
-                Create Token
-            </button>
 
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="openCreateTokenModal()"
+                        class="px-4 py-1 bg-green-500 text-white rounded-md hover:bg-green-600">
+                        Create Token
+                    </button>
+                </div>
+            </form>
         </div>
 
         <!-- Table for Recent Activities -->
@@ -69,9 +71,9 @@
                     <th class="px-4 py-2">Gas Cylinder Type</th>
                     <th class="px-4 py-2">User</th>
                     <th class="px-4 py-2">
-                        <a href="{{ route('manager.tokens.index', array_merge(request()->query(), ['sort_by' => 'created_at', 'sort_direction' => request('sort_direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                        <a href="{{ route('manager.tokens.index', array_merge(request()->query(), ['sort_by' => 'expires_at', 'sort_direction' => request('sort_direction') === 'asc' ? 'desc' : 'asc'])) }}"
                             class="flex items-center space-x-1">
-                            <span>Created At</span>
+                            <span>Expired At</span>
                             @if (request('sort_by') === 'created_at')
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24" stroke-width="2">
@@ -85,20 +87,37 @@
             </thead>
             <tbody>
                 @forelse($tokens as $token)
-                    <tr>
-                        <td class="px-4 py-2">{{ $token->id }}</td>
-                        <td class="px-4 py-2">{{ $token->status }}</td>
-                        <td class="px-4 py-2">{{ $token->description }}</td>
-                        <td class="px-4 py-2">{{ $token->gas_cylinder_name ?? 'N/A' }}</td>
-                        <td class="px-4 py-2">{{ $token->user_name }}</td>
-                        <td class="px-4 py-2">{{ $token->created_at->format('Y-m-d H:i') }}</td>
-                        <td class="px-4 py-2">
-                            <button onclick="openModal({{ $token }})"
-                                class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">
-                                View
-                            </button>
-                        </td>
-                    </tr>
+                                <tr class=" @php
+                                    $expireDate = \Carbon\Carbon::parse($token->expires_at);
+                                    $now = \Carbon\Carbon::now();
+                                    $daysLeft = $expireDate->diffInDays($now);
+
+                                    if ($token->status === 'canceled') {
+                                        echo 'bg-red-300';
+                                    } elseif ($token->status === 'completed') {
+                                        echo 'bg-green-200';
+                                    } elseif ($daysLeft == 1) {
+                                        echo 'bg-yellow-200';
+                                    } else {
+                                        echo 'bg-white';
+                                    }
+                                @endphp ">
+                                    <td class="px-4 py-2">{{ $token->id }}</td>
+                                    <td class="px-4 py-2">{{ $token->status }}</td>
+                                    <td class="px-4 py-2">{{ $token->description }}</td>
+                                    <td class="px-4 py-2">{{ $token->gas_cylinder_name ?? 'N/A' }}</td>
+                                    <td class="px-4 py-2">{{ $token->user_name }}</td>
+                                    <td class="px-4 py-2">{{ $token->expires_at }}</td>
+                                    <td class="px-4 py-2">
+                                        <!-- Disable button if status is 'complete' or 'canceled' -->
+                                        <button onclick="openModal({{ $token }})"
+                                            class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+                                            @if(in_array($token->status, ['complete', 'canceled'])) disabled @endif>
+                                            Update Status
+                                        </button>
+                                    </td>
+                                </tr>
+
                 @empty
                     <tr>
                         <td colspan="7" class="text-center px-4 py-2">No tokens found.</td>
@@ -120,7 +139,7 @@
 
 </main>
 <div id="createTokenModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/4">
         <!-- Header Section -->
         <div class="flex justify-between items-center border-b pb-3 mb-4">
             <h2 class="text-2xl font-bold text-gray-800">Create Token</h2>
@@ -131,6 +150,8 @@
         <!-- Form Section -->
         <form id="createTokenForm">
             <div class="mb-4">
+                <input type="hidden" id="userOutlet" value="{{$loggedInUserOutletId}}">
+
                 <label for="tokenUser" class="block font-medium text-gray-700 mb-1">Select User</label>
                 <select id="tokenUser" class="px-3 py-1 border border-gray-300 rounded-md w-full" required>
                     <option value="" disabled selected>Select a user...</option>
@@ -166,40 +187,38 @@
 </div>
 
 <div id="tokenModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
-        <!-- Header Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/4">
         <div class="flex justify-between items-center border-b pb-3 mb-4">
             <h2 class="text-2xl font-bold text-gray-800">Token Details</h2>
             <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
         </div>
+        <h5>Token History</h5>
+        <table class=" border-collapse border border-slate-500 w-full text-sm text-left text-gray-500 mt-6">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                <tr>
+                    <th class="px-4 py-2 border border-slate-600">Status</th>
+                    <th class="px-4 py-2 border border-slate-600">Reasone</th>
+                </tr>
+            </thead>
+            <tbody id="history-tbody">
 
-        <!-- Gas Stock Display -->
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-md mb-4">
-            <strong>Current Gas Stock:</strong> <span id="modalGasStock" class="font-semibold">Loading...</span>
-        </div>
+            </tbody>
+        </table>
+        <!-- Header Section -->
 
-        <!-- Token Information -->
-        <div class="grid grid-cols-2 gap-4 mb-4 text-gray-700">
-            <div><strong>Token ID:</strong> <span id="modalTokenId"></span></div>
-            <div><strong>Status:</strong> <span id="modalTokenStatus"></span></div>
-            <div><strong>Is Active:</strong> <span id="modalTokenIsActive"></span></div>
-            <div><strong>Description:</strong> <span id="modalTokenDescription"></span></div>
-            <div><strong>User:</strong> <span id="modalTokenUser"></span></div>
-        </div>
 
-        <!-- Status Update Section -->
-        <div class="mb-4">
+
+        <div class="mb-4 mt-4">
             <label for="updateStatus" class="block font-medium text-gray-700 mb-1">Update Status</label>
             <select id="updateStatus" class="px-3 py-1 border border-gray-300 rounded-md w-full"
                 onchange="handleStatusChange()">
                 <option value="pending">Pending</option>
                 <option value="scheduled">Scheduled</option>
-                <option value="completed">Completed</option>
-                <option value="delivered">Delivered</option>
-                <option value="canceled">Canceled</option>
-                <option value="reasigned">Reasigned</option>
                 <option value="cylinder_received">Cylinder Received</option>
                 <option value="payment_complete">Payment Complete</option>
+                <option value="completed">Order Completed</option>
+                <option value="canceled">Canceled</option>
+
             </select>
         </div>
 
@@ -212,6 +231,8 @@
 
         <!-- Action Buttons -->
         <div class="flex justify-end space-x-2 mt-4">
+            <div class="hidden"><strong>Token ID:</strong> <span id="modalTokenId"></span></div>
+
             <button onclick="updateTokenStatus()"
                 class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
                 Save
@@ -226,26 +247,52 @@
 
 
 
+
 <script>
     let currentTokenId;
     function openCreateTokenModal() {
         document.getElementById('createTokenModal').classList.remove('hidden');
     }
 
-    // Close the Create Token Modal
     function closeCreateTokenModal() {
         document.getElementById('createTokenModal').classList.add('hidden');
     }
-    // Open Modal and Populate Data
+
     function openModal(token) {
-        console.log(token.user_name)
         currentTokenId = token.id;
         document.getElementById('modalTokenId').innerText = token.id;
-        document.getElementById('modalTokenStatus').innerText = token.status;
-        document.getElementById('modalTokenIsActive').innerText = token.isActive ? 'Yes' : 'No';
-        document.getElementById('modalTokenDescription').innerText = token.description;
-        document.getElementById('modalTokenUser').innerText = token.user_name;
         document.getElementById('updateStatus').value = token.status;
+
+
+        $.ajax({
+            url: '/api/token-history/' + token.id, // Adjust with the correct route
+            method: 'GET',
+            success: function (response) {
+                if (response.success) {
+
+                    const historyContainer = document.getElementById('history-tbody');
+                    historyContainer.innerHTML = ''; // Clear previous history
+
+                    response.history.forEach(item => {
+                        const historyRow = document.createElement('tr');
+                        historyRow.classList.add('history-item');
+
+                        historyRow.innerHTML = `
+                    <td class="border border-slate-700">${item.updateStatus}</td>
+                    <td  class="border border-slate-700">${item.reason || ''}</td>
+                `;
+                        historyContainer.appendChild(historyRow);
+                    });
+
+                } else {
+                    alert(response.message); // No history found
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching token history:', error);
+                alert('Failed to fetch token history.');
+            }
+        });
         document.getElementById('tokenModal').classList.remove('hidden');
     }
 
@@ -265,9 +312,8 @@
     async function updateTokenStatus() {
         const status = document.getElementById('updateStatus').value;
         const comment = document.getElementById('updateComment').value.trim();
-        const tokenId = document.getElementById('modalTokenId').innerText; // Assuming tokenId is shown in the modal
+        const tokenId = document.getElementById('modalTokenId').innerText;
 
-        // Validation for canceled status
         if (status === 'canceled' && !comment) {
             alert('A comment is required when canceling a token.');
             return;
@@ -290,13 +336,12 @@
 
             if (response.ok) {
                 alert(data.message || 'Token status updated successfully!');
-                closeModal(); // Close modal on success
-                location.reload(); // Optionally refresh the page or update the UI dynamically
+                closeModal();
+                location.reload();
             } else {
                 alert(data.error || 'Failed to update token status.');
             }
         } catch (error) {
-            console.error('Error updating token status:', error);
             alert('An error occurred while updating the token status.');
         }
     }
@@ -306,13 +351,46 @@
         document.getElementById('tokenModal').classList.add('hidden');
     }
 
-    // Simulate fetching gas stock
-    function loadGasStock() {
-        document.getElementById('modalGasStock').innerText = '150 Cylinders Available';
-    }
+    function createToken() {
 
-    // Call this when the modal is shown
-    loadGasStock();
+        const userOutlet = document.getElementById('userOutlet').value;
+        const tokenUser = document.getElementById('tokenUser').value;
+        const gasCylinderType = document.getElementById('gasCylinderType').value;
+        
+        $.ajax({
+            url: "/api/issue-token",
+            type: "POST",
+            data: JSON.stringify({
+                "user_id": tokenUser,
+                "outlet_id": userOutlet,
+                "cylinder_type_id": gasCylinderType
+            }),
+            contentType: "application/json", 
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert(response.success);
+                    window.location.reload();
+                }
+            },
+            error: function (xhr) {
+
+                var errors = xhr.responseJSON.errors;
+                console.log(errors);
+                if (errors) {
+                    for (var field in errors) {
+                        var errorMessage = errors[field].join(', ');
+                        $('#' + field).next('.error-message').remove(); // Remove previous error messages
+                        $('#' + field).after('<div class="error-message text-red-500">' + errorMessage + '</div>');
+                    }
+                } else {
+                    alert(xhr.responseJSON.error || 'An unexpected error occurred');
+                }
+            }
+        });
+    }
 
 </script>
 <script>

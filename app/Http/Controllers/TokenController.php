@@ -16,18 +16,31 @@ use Illuminate\Support\Str;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+
+use App\Services\TwilioSmsService;
 class TokenController extends Controller
 {
 
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $status = $request->input('status');
+        $status = $request->input('status', 'pending');
         $isActive = $request->input('isActive');
-        $sortBy = $request->input('sort_by', 'created_at');
+        $sortBy = $request->input('sort_by', 'expires_at');
         $sortDirection = $request->input('sort_direction', 'desc');
 
-        $tokens = Token::select('tokens.id', 'tokens.status', 'tokens.isActive', 'tokens.description', 'tokens.created_at', 'gas_cylinders.name as gas_cylinder_name', 'users.name as user_name') // Add users.name to select user name
+        $loggedInUserOutletId = auth()->user()->outlet_id;
+
+
+        $tokens = Token::select(
+            'tokens.id',
+            'tokens.status',
+            'tokens.isActive',
+            'tokens.description',
+            'tokens.expires_at',
+            'gas_cylinders.name as gas_cylinder_name',
+            'users.name as user_name'
+        )
             ->leftJoin('gas_cylinders', 'tokens.cylinder_type_id', '=', 'gas_cylinders.id')
             ->leftJoin('users', 'tokens.user_id', '=', 'users.id')
             ->when($search, function ($query, $search) {
@@ -43,22 +56,31 @@ class TokenController extends Controller
             ->when($isActive, function ($query, $isActive) {
                 return $query->where('tokens.isActive', '=', $isActive);
             })
+            ->where('tokens.outlet_id', '=', $loggedInUserOutletId)
             ->orderBy($sortBy, $sortDirection)
             ->paginate(10);
 
         $users = User::where('isActive', 1)
-            ->where('role_id', 3);
+            ->where('role_id', '=', 3)
+            ->get();
+
+
         $gasCylinders = GasCylinder::all();
 
-        return view('manager.token.index', ['tokens' => $tokens, 'users' => $users, 'gasCylinders' => $gasCylinders]);
+        return view('manager.token.index', [
+            'tokens' => $tokens,
+            'users' => $users,
+            'gasCylinders' => $gasCylinders,
+            "loggedInUserOutletId" => $loggedInUserOutletId
+        ]);
 
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, TwilioSmsService $smsService)
     {
         $request->validate([
             'status' => 'required|string',
-            'reason' => 'nullable|string', // Reason is required only for specific statuses
+            'reason' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -70,7 +92,16 @@ class TokenController extends Controller
                 return response()->json(['error' => 'A reason is required when canceling a token'], 422);
             }
 
-            // Log current status in token history
+            $user = $token->user;
+            if (!$user || !$user->contact_number) {
+                return response()->json(['error' => 'User contact number not found'], 404);
+            }
+            $countryCode = '+94';
+            $userContactNumber = $user->contact_number;
+
+            if (!str_starts_with($userContactNumber, $countryCode)) {
+                $userContactNumber = $countryCode . ltrim($userContactNumber, '0');
+            }
             TokenHistory::create([
                 'token_id' => $token->id,
                 'currentStatus' => $token->status,
@@ -83,6 +114,21 @@ class TokenController extends Controller
             $token->status = $request->status;
             $token->save();
 
+
+            $message = "Your token  has been: {$request->status}. Thank you!";
+
+            if ($request->status === Token::STATUS_CANCELED) {
+                $message = "Your token  has been: {$request->status}. Please contct admin for more details!";
+            }
+
+            $smsResponse = $smsService->sendSms(
+                $userContactNumber,
+                $message
+            );
+            if (!$smsResponse['success']) {
+                throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
+            }
+
             DB::commit();
 
             return response()->json(['message' => 'Token status updated successfully']);
@@ -92,7 +138,7 @@ class TokenController extends Controller
         }
     }
 
-    public function issueToken(Request $request)
+    public function issueToken(Request $request, TwilioSmsService $smsService)
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
@@ -112,13 +158,12 @@ class TokenController extends Controller
 
         try {
             $activeTokensCount = Token::where('user_id', $userId)
-                ->where('cylinder_type_id', $cylinderTypeId)
                 ->whereIn('status', [Token::STATUS_PENDING, Token::STATUS_SCHEDULED])
                 ->count();
 
             if ($activeTokensCount >= 2) {
                 DB::rollBack();
-                return response()->json(['error' => 'You cannot have more than 2 active tokens for this cylinder type.'], 400);
+                return response()->json(['error' => 'You cannot have more than 2 active tokens.'], 400);
             }
 
             $branchToken = OutletToken::where('outlet_id', $outletId)
@@ -164,6 +209,23 @@ class TokenController extends Controller
                 'reason' => null,
                 'updated_by' => Auth::id(),
             ]);
+            $tokenUser = User::find($userId);
+            $message = "Your token  has been: Created. Thank you!";
+
+            $countryCode = '+94';
+            $userContactNumber = $tokenUser->contact_number;
+
+            if (!str_starts_with($userContactNumber, $countryCode)) {
+                $userContactNumber = $countryCode . ltrim($userContactNumber, '0');
+            }
+
+            $smsResponse = $smsService->sendSms(
+                $userContactNumber,
+                $message
+            );
+            if (!$smsResponse['success']) {
+                throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
+            }
             DB::commit();
 
             return response()->json(['success' => 'Token issued successfully.', 'token' => $token], 200);
@@ -180,6 +242,26 @@ class TokenController extends Controller
 
             // Return the error message
             return response()->json(['error' => 'An error occurred while issuing the token. Please try again later.', $e->getMessage()], 500);
+        }
+    }
+    public function getTokenHistoryByID($id)
+    {
+        try {
+            $history = TokenHistory::where('token_id', $id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            if ($history->isEmpty()) {
+                return response()->json(['success' => false, 'message' => 'No history found for this token.']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'history' => $history
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 

@@ -91,7 +91,9 @@ Route::middleware(['auth:web'])->group(function () {
             Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
 
             Route::get('/CoparateCustomers', [CustomerController::class, 'Coparateindex'])->name('CoparateCustomers.Coparateindex');
+            Route::get('/updateCopareateCustomerStatus/{id}', [CustomerController::class, 'updateCorporateCustomerStatus'])->name('CoparateCustomers.updateCopareateCustomerStatus');
 
+            
 
 
         });

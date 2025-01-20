@@ -21,7 +21,8 @@ return new class extends Migration {
                 'canceled',
                 'reasigned',
                 'cylinder_received',
-                'payment_complete'
+                'payment_complete',
+                'completed'
             ]);
             $table->enum('updateStatus', [
                 'pending',
@@ -30,7 +31,8 @@ return new class extends Migration {
                 'canceled',
                 'reasigned',
                 'cylinder_received',
-                'payment_complete'
+                'payment_complete',
+                'completed'
             ]);
             $table->string('reason')->nullable();
             $table->boolean('isActive')->default(true);

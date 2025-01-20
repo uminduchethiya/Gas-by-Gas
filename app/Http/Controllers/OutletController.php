@@ -116,15 +116,6 @@ class OutletController extends Controller
             $outlet->update([
                 'UserID' => $user->id,
             ]);
-            $activeGasCylinders = GasCylinder::where('isActive', true)->get();
-            foreach ($activeGasCylinders as $cylinder) {
-                OutletToken::create([
-                    'outlet_id' => $outlet->id,
-                    'cylinder_type_id' => $cylinder->id,
-                    'maxTokens' => config('tokens.DEFAULT_TOKEN_LIMIT', 100),
-                    'currentTokens' => config('tokens.DEFAULT_TOKEN_LIMIT', 100),
-                ]);
-            }
 
             DB::commit(); // Commit the transaction
             return response()->json(['success' => 'Outlet created successfully!']);

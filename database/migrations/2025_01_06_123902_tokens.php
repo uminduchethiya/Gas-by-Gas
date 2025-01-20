@@ -15,7 +15,7 @@ return new class extends Migration
                 'scheduled', 
                 'cylinder_received',
                 'payment_complete',
-                'complete', 
+                'completed', 
                 'canceled', 
                 'reassigned'
             ])->default('pending');
