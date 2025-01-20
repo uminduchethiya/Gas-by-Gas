@@ -17,5 +17,6 @@ class UserRoleSeeder extends Seeder
         UserRole::create(['id' => UserRoleConst::ADMIN, 'name' => 'Admin']);
         UserRole::create(['id' => UserRoleConst::MANAGER, 'name' => 'Manager']);
         UserRole::create(['id' => UserRoleConst::USER, 'name' => 'User']);
+        UserRole::create(['id' => UserRoleConst::ORGANIZATION, 'name' => 'Organization']);
     }
 }

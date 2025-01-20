@@ -15,6 +15,8 @@ export default {
                 "text-primary": "#0C969C",
                 "text-secondary": "#6B8D8E",
                 "text-white": "#FFFFFF",
+                "text-light": "#eab308",
+                "text-dark": "#ca8a04",
             },
         },
     },
