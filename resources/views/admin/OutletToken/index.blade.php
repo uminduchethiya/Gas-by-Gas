@@ -61,7 +61,6 @@
 
                     <th class="px-4 py-2">Max Tokens</th>
                     <th class="px-4 py-2">Current Tokens</th>
-                    <th class="px-4 py-2">Token Amount</th>
 
                     <th class="px-4 py-2">Actions</th>
                 </tr>
@@ -75,7 +74,6 @@
                         <td class="px-4 py-2">{{ $outletToken->gas_cylinder_name }}</td>
                         <td class="px-4 py-2">{{ $outletToken->maxTokens }}</td>
                         <td class="px-4 py-2">{{ $outletToken->currentTokens }}</td>
-                        <td class="px-4 py-2">{{ $outletToken->token_amount }}</td>
 
 
                         <td class="px-4 py-2">
@@ -128,7 +126,7 @@
                         required>
                         <option value="">Select Branch</option>
                         @foreach ($outlets as $outlet)
-                            <option value="{{ $outlet->OutletID }}" {{ old('outlet_id') == $outlet->OutletID ? 'selected' : '' }}>
+                            <option value="{{ $outlet->id }}" {{ old('outlet_id') == $outlet->id ? 'selected' : '' }}>
                                 {{ $outlet->Name }}
                             </option>
                         @endforeach

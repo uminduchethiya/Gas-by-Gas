@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->decimal('size', 5, 2);
-            $table->boolean('isActive')->nullable();
+            $table->boolean('isActive')->default(true);
             $table->timestamps();
         });
     }

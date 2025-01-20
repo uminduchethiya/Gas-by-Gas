@@ -123,12 +123,12 @@
 
             <!-- Branch Input -->
             <div>
-                <label for="branch" class="block text-sm font-medium text-text-secondary">Branch</label>
-                <select id="branch" name="branch" required
+                <label for="outlet" class="block text-sm font-medium text-text-secondary">Outlet</label>
+                <select id="outlet" name="outlet" required
                     class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg">
                     <option value="">Select a branch</option>
-                    @foreach ($branches as $branch)
-                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                    @foreach ($outlets as $outlet)
+                        <option value="{{ $outlet->id }}">{{ $outlet->Name }}</option>
                     @endforeach
                 </select>
             </div>

@@ -11,13 +11,15 @@ return new class extends Migration
     {
         Schema::create('stock', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('branch_id'); 
-            $table->unsignedBigInteger('gas_cylinder_id'); 
+            
             $table->integer('quantity'); 
-            $table->integer('isActive')->default(1); 
+            $table->boolean('isActive')->default(true);
             $table->timestamps();
 
-            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
+            $table->unsignedBigInteger('outlet_id'); 
+            $table->unsignedBigInteger('gas_cylinder_id');  
+            
+            $table->foreign('outlet_id')->references('id')->on('outlets')->onDelete('cascade');
             $table->foreign('gas_cylinder_id')->references('id')->on('gas_cylinders')->onDelete('cascade');
         });
     }

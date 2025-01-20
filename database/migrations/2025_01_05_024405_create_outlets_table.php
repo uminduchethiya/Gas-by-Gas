@@ -12,20 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('outlets', function (Blueprint $table) {
-            $table->id('OutletID');
-            $table->unsignedBigInteger('branch_id');
-            $table->unsignedBigInteger('UserID')->nullable();
+            $table->id();
+           
             $table->string('Name', 255);
             $table->text('Address');
             $table->string('ContactNumber', 15);
             $table->string('Email', 255)->nullable()->unique();
             $table->decimal('Latitude', 10, 8)->nullable();
             $table->decimal('Longitude', 11, 8)->nullable();
-            $table->enum('Status', ['Active', 'Inactive'])->default('Active');
+            $table->boolean('isActive')->default(true);
             $table->timestamps();
         
+
+            $table->unsignedBigInteger('branch_id');
+            $table->unsignedBigInteger('user_id')->nullable();
+
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
-            $table->foreign('UserID')->references('id')->on('users')->onDelete('set null');
         });
         
     }

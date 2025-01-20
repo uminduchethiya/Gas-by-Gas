@@ -85,15 +85,15 @@
             <tbody>
                 @forelse($outlets as $outlet)
                     <tr>
-                        <td class="px-4 py-2">{{ $outlet->OutletID }}</td>
+                        <td class="px-4 py-2">{{ $outlet->id }}</td>
                         <td class="px-4 py-2">{{ $outlet->branch_name }}</td>
-                        <td class="px-4 py-2">{{ $outlet->user_name }}</td>
+                        <td class="px-4 py-2">{{ $outlet->Name }}</td>
                         <td class="px-4 py-2">{{ $outlet->Email }}</td>
                         <td class="px-4 py-2">{{ $outlet->Address }}</td>
                         <td class="px-4 py-2">{{ $outlet->ContactNumber }}</td>
-                        <td class="px-4 py-2">{{ $outlet->Status }}</td>
+                        <td class="px-4 py-2">{{ $outlet->isActive }}</td>
                         <td class="px-4 py-2">
-                            <button onclick="openViewModal({{ $outlet->OutletID  }})"
+                            <button onclick="openViewModal({{ $outlet->id  }})"
                                 class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">
                                 View
                             </button>
@@ -180,7 +180,7 @@
                     <!-- Status -->
                     <div class="mb-4">
                         <label for="Status" class="block text-sm font-medium text-gray-700">Status</label>
-                        <select id="Status" name="Status" required
+                        <select id="isActive" name="isActive" required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
@@ -269,13 +269,16 @@
         if (mode === 'edit') {
             modalTitle.textContent = 'Edit Outlet';
             console.log(outlet);
-            document.getElementById('outletId').value = outlet.OutletID || '';
+            document.getElementById('outletId').value = outlet.id || '';
             document.getElementById('branch_id').value = outlet.branch_id || '';
             document.getElementById('Name').value = outlet.Name || '';
             document.getElementById('Address').value = outlet.Address || '';
             document.getElementById('ContactNumber').value = outlet.ContactNumber || '';
             document.getElementById('Email').value = outlet.Email || '';
-            document.getElementById('Status').value = outlet.Status || '';
+            let isActiveValue = outlet.isActive === 1 ? 'Active' : 'Inactive';
+
+            // Get the select element and set the value
+            document.getElementById('isActive').value = isActiveValue || '';
         } else {
             modalTitle.textContent = 'Add Outlet';
             form.reset(); // Clear the form for new outlet
@@ -286,7 +289,7 @@
 
 
 
-   
+
 
     $(document).ready(function () {
         // Handle form submission via AJAX
@@ -411,7 +414,7 @@
     }
 
     function closeModal() {
-        $('#viewOutlet').addClass('hidden'); 
+        $('#viewOutlet').addClass('hidden');
         document.getElementById('addEditOutlet').classList.add('hidden');
 
     }

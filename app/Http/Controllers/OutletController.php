@@ -21,28 +21,28 @@ class OutletController extends Controller
     public function index(Request $request)
     {
         // Default sort parameters
-        $sortBy = $request->get('sort_by', 'OutletID');
+        $sortBy = $request->get('sort_by', 'id');
         $sortDirection = $request->get('sort_direction', 'asc');
 
         $search = $request->get('search');
         $status = $request->get('status');
-        $isActive = $request->get('is_active', 'Active');
+        $isActive = $request->get('is_active', true);
 
         $outlets = Outlet::select(
-            'outlets.OutletID',
+            'outlets.id',
             'outlets.Name',
             'outlets.Address',
             'outlets.ContactNumber',
             'outlets.Email',
             'outlets.Latitude',
             'outlets.Longitude',
-            'outlets.Status',
+            'outlets.isActive',
             'branches.name as branch_name',
             'branches.id as branch_id',
             'users.name as user_name'
         )
             ->leftJoin('branches', 'outlets.branch_id', '=', 'branches.id')
-            ->leftJoin('users', 'outlets.UserID', '=', 'users.id')
+            ->leftJoin('users', 'outlets.user_id', '=', 'users.id')
             ->when($search, function ($query, $search) {
                 return $query->where(function ($query) use ($search) {
                     $query->where('outlets.Name', 'like', '%' . $search . '%')
@@ -51,10 +51,10 @@ class OutletController extends Controller
                 });
             })
             ->when($status, function ($query, $status) {
-                return $query->where('outlets.Status', '=', $status);
+                return $query->where('outlets.isActive', '=', $status);
             })
             ->when($isActive, function ($query, $isActive) {
-                return $query->where('outlets.Status', '=', $isActive);
+                return $query->where('outlets.isActive', '=', $isActive);
             })
             ->orderBy('outlets.' . $sortBy, $sortDirection) // Use the dynamic sorting
             ->paginate(10);
@@ -83,9 +83,21 @@ class OutletController extends Controller
                 'Address' => 'required|string',
                 'ContactNumber' => 'required|string|max:15',
                 'Email' => 'nullable|email|unique:users,email',
-                'Status' => 'required|in:Active,Inactive',
+                'isActive' => 'required',
             ]);
             $loginUrl = url('/login-view'); // URL to the login page
+            $isActive = ($validated['isActive'] === 'Active') ? 1 : 0;
+
+            $outlet = Outlet::create([
+                'name' => $validated['Name'],
+                'address' => $validated['Address'],
+                'ContactNumber' => $validated['ContactNumber'],
+                'email' => $request->Email,
+                'isActive' => $isActive,
+                'branch_id' => $validated['branch_id'],
+                'UserID' => null,
+            ]);
+
 
             $user = null;
             if ($validated['Email']) {
@@ -96,30 +108,21 @@ class OutletController extends Controller
                     'contact_number' => $request->ContactNumber,
                     'address' => $request->Address,
                     'role_id' => UserRoleConst::MANAGER,
-                    'branch_id' => $request->branch_id,
+                    'outlet_id' => $outlet->id,
                 ]);
                 Mail::to($user->email)->send(new OutletCreated($user, $loginUrl));
             }
 
-            $outlet = Outlet::create([
-                'branch_id' => $validated['branch_id'],
-                'UserID' => $user->id ?? null,
-                'Email' => $request->Email,
-                'Name' => $validated['Name'],
-                'Address' => $validated['Address'],
-                'ContactNumber' => $validated['ContactNumber'],
-                'Status' => $validated['Status'],
+            $outlet->update([
+                'UserID' => $user->id,
             ]);
-
             $activeGasCylinders = GasCylinder::where('isActive', true)->get();
-
             foreach ($activeGasCylinders as $cylinder) {
                 OutletToken::create([
-                    'OutletID' => $outlet->OutletID,
-                    'gas_cylinder_id' => $cylinder->id,
+                    'outlet_id' => $outlet->id,
+                    'cylinder_type_id' => $cylinder->id,
                     'maxTokens' => config('tokens.DEFAULT_TOKEN_LIMIT', 100),
                     'currentTokens' => config('tokens.DEFAULT_TOKEN_LIMIT', 100),
-                    'token_amount' => config('tokens.DEFAULT_TOKEN_LIMIT', 100),
                 ]);
             }
 
@@ -153,9 +156,9 @@ class OutletController extends Controller
                 'Address' => 'required|string',
                 'ContactNumber' => 'required|string|max:15',
                 'Email' => 'nullable|email|unique:users,email,' . $id,
-                'Status' => 'required|in:Active,Inactive',
+                'isActive' => 'required|in:Active,Inactive',
             ]);
-
+            $validated['isActive'] = ($validated['isActive'] === 'Active') ? 1 : 0;
             $outlet = Outlet::findOrFail($id);
             $outlet->update($validated);
 
@@ -165,31 +168,30 @@ class OutletController extends Controller
         }
     }
 
-    public function show($id)
+    public function show($outletId)
     {
         try {
-            $outlet = Outlet::with(['branchTokens.gasCylinder'])  // Eager load outlet tokens and gas cylinders
-                ->findOrFail($id);
-
+            $outlet = Outlet::with(['outletTokens.gasCylinder'])  // Eager load outletTokens and their related gasCylinder
+            ->findOrFail($outletId);
             $outletData = [
                 'Name' => $outlet->Name,
                 'Address' => $outlet->Address,
                 'ContactNumber' => $outlet->ContactNumber,
                 'Status' => $outlet->Status,
-                'Tokens' => $outlet->branchTokens->map(function ($token) {
+                'Tokens' => $outlet->outletTokens->map(function ($token) {
                     return [
-                        'gas_cylinder_name' => $token->gasCylinder->name,  // Assuming 'name' column exists in GasCylinder
+                        'gas_cylinder_name' => $token->gasCylinder->name,
                         'currentTokens' => $token->currentTokens,
                         'maxTokens' => $token->maxTokens,
                         'token_amount' => $token->token_amount
                     ];
                 })
             ];
-            
+
 
             return response()->json(['success' => true, 'outlet' => $outletData]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Outlet not found'], 404);
+            return response()->json(['error' => $e->getMessage()], 404);
         }
     }
 

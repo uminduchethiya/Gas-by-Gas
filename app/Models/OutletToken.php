@@ -12,11 +12,10 @@ class OutletToken extends Model
     protected $table = 'outlet_tokens';
 
     protected $fillable = [
-        'OutletID',
-        'gas_cylinder_id',
+        'outlet_id',
+        'cylinder_type_id',
         'maxTokens',
         'currentTokens',
-        'token_amount',
     ];
 
     
@@ -28,6 +27,6 @@ class OutletToken extends Model
    
     public function gasCylinder()
     {
-        return $this->belongsTo(GasCylinder::class, 'gas_cylinder_id');
+        return $this->belongsTo(GasCylinder::class, 'cylinder_type_id');
     }
 }

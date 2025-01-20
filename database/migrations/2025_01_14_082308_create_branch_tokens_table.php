@@ -17,10 +17,15 @@ class CreateBranchTokensTable extends Migration
             $table->id();
             $table->integer('maxTokens');
             $table->integer('currentTokens');
-            $table->unsignedBigInteger('OutletID'); 
-            $table->foreign('OutletID')->references('OutletID')->on('outlets')->onDelete('cascade'); 
-            $table->foreignId('gas_cylinder_id')->nullable()->constrained('gas_cylinders')->onDelete('set null');
-            $table->decimal('token_amount', 10, 2)->default(0.00);
+
+            $table->unsignedBigInteger('cylinder_type_id'); 
+            $table->unsignedBigInteger(column: 'outlet_id'); 
+
+            $table->foreign('cylinder_type_id')->references('id')->on('gas_cylinders')->onDelete('cascade');
+            $table->foreign('outlet_id')->references('id')->on('outlets')->onDelete('cascade');
+         
+            $table->boolean('isActive')->default(true);
+
             $table->timestamps();
         });
         

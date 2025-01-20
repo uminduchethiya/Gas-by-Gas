@@ -13,27 +13,37 @@ return new class extends Migration
             $table->enum('status', [
                 'pending', 
                 'scheduled', 
-                'delivered', 
+                'cylinder_received',
+                'payment_complete',
+                'complete', 
                 'canceled', 
-                'reasigned', 
-                'cylinder_received', 
-                'payment_complete'
+                'reassigned'
             ])->default('pending');
             $table->boolean('isActive')->default(true);
-            $table->string('description')->nullable();
-
+            $table->text('description')->nullable();
+        
             $table->unsignedBigInteger('user_id'); 
             $table->unsignedBigInteger('cylinder_type_id'); 
-            $table->unsignedBigInteger('branch_id'); 
-            
+            $table->unsignedBigInteger(column: 'outlet_id'); 
+        
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('cylinder_type_id')->references('id')->on('gas_cylinders')->onDelete('cascade');
-            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
-
+            $table->foreign('outlet_id')->references('id')->on('outlets')->onDelete('cascade');
+        
+            $table->integer('quantity')->default(1);
+            $table->timestamp('expires_at')->nullable();
+            $table->string('token_code')->unique()->nullable();
+        
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+        
             $table->timestamps();
-
+            $table->softDeletes();
         
         });
+        
     }
 
     public function down(): void

@@ -44,8 +44,8 @@
                         <td class="px-4 py-2">
                            <button onclick="openEditModal({{ $plan }})"
                             class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600
-                            {{ in_array($plan->Status, ['Discrepancy', 'Completed']) ? 'cursor-not-allowed bg-gray-400' : '' }}"
-                            {{ in_array($plan->Status, ['Discrepancy', 'Completed']) ? 'disabled' : '' }}>
+                            {{ in_array($plan->Status, ['Delivered']) ? 'cursor-not-allowed bg-gray-400' : '' }}"
+                            {{ in_array($plan->Status, ['Delivered']) ? 'disabled' : '' }}>
                             Edit
                         </button>
 
@@ -125,7 +125,7 @@
                 <select id="Status" name="Status" required
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     <option value="Delivered">Delivered</option>
-                    <option value="Discrepancy Completed">Discrepancy Completed</option>
+                    <option value="Discrepancy">Discrepancy </option>
                 </select>
             </div>
 

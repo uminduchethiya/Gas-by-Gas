@@ -18,18 +18,18 @@ class DeliveryPlan extends Model
         'Status',
         'Notes',
         'isActive',
-        'OutletID',
-        'gas_cylinder_id',
+        'outlet_id',
+        'cylinder_type_id',
     ];
 
     public function outlet()
     {
-        return $this->belongsTo(Outlet::class, 'OutletID');
+        return $this->belongsTo(Outlet::class, 'outlet_id');
     }
 
     // Relationship with GasCylinder
     public function gasCylinder()
     {
-        return $this->belongsTo(GasCylinder::class, 'gas_cylinder_id');
+        return $this->belongsTo(GasCylinder::class, 'cylinder_type_id');
     }
 }

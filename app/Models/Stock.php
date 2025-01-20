@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Stock extends Model
 {
     use HasFactory;
+    protected $table = 'stock';
 
     protected $fillable = [
-        'branch_id',
+        'outlet_id',
         'gas_cylinder_id',
         'quantity',
         'isActive',
