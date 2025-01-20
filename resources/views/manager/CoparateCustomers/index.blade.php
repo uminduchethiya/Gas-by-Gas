@@ -164,13 +164,13 @@
                     <td class="px-4 py-2">{{ $user->contact_number }}</td>
                     <td class="px-4 py-2">{{ $user->nic }}</td>
                     <td class="px-4 py-2">{{ $user->address }}</td>
-                    <td class="px-4 py-2">{{ $user->isActive }}</td>
+                    <td class="px-4 py-2">{{ $user->status }}</td>
                     <td class="px-4 py-2">
-                        <button onclick="openViewModal({{ $user->id  }})"
+                        <button onclick="window.open('{{ asset('storage/' . $user->verification_file) }}', '_blank')"
                             class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">
                             View Docs
                         </button>
-                        <button onclick="openModal('edit', {{ $user }})"
+                        <button onclick="activateUser( {{ $user->id }})"
                             class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600">
                             approve
                         </button>
@@ -203,7 +203,6 @@
         document.getElementById('addCustomerModal').classList.add('hidden');
     }
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -211,11 +210,7 @@
         $('#saveButton').click(function (e) {
             e.preventDefault(); // Prevent the form from submitting normally
 
-
-
             var formData = new FormData($("#addEditOutletForm")[0]);
-
-            console.log(formData);
             $.ajax({
                 url: "{{ route('registerByAdmin.api') }}", // The API route for registration
                 type: "POST",
@@ -271,6 +266,41 @@
             }
         });
     }
+    function openViewModal(user) {
+        const fileUrl = user.verification_file;
+
+        if (fileUrl) {
+            // Trigger a download
+            window.location.href = "storage/" + fileUrl;
+        } else {
+            alert("No verification file found for this user.");
+        }
+    }
+    async function activateUser(id) {
+        try {
+            const response = await fetch(`/manager/updateCopareateCustomerStatus/${id}`, {
+                method: 'Get',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.message || 'Token status updated successfully!');
+                closeModal();
+                location.reload();
+            } else {
+                alert(data.error || 'Failed to update token status.');
+            }
+        } catch (error) {
+            alert('An error occurred while updating the token status.');
+        }
+    }
+
 </script>
 
 

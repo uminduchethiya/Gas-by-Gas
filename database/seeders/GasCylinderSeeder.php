@@ -49,14 +49,7 @@ class GasCylinderSeeder extends Seeder
             $cylinder = GasCylinder::create($cylinder);
 
 
-            foreach ($outlets as $outlet) {
-                OutletToken::create([
-                    'outlet_id' => $outlet->id,
-                    'cylinder_type_id' => $cylinder->id,
-                    'maxTokens' => config('tokens.DEFAULT_TOKEN_LIMIT', 100), 
-                    'currentTokens' =>config('tokens.DEFAULT_TOKEN_LIMIT', 100),
-                ]);
-            }
+            
         }
     }
 }

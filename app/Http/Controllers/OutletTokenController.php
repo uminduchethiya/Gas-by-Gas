@@ -36,8 +36,7 @@ class OutletTokenController extends Controller
             ->leftJoin('gas_cylinders', 'outlet_tokens.cylinder_type_id', '=', 'gas_cylinders.id')
             ->when($search, function ($query, $search) {
                 return $query->where(function ($query) use ($search) {
-                    $query->where('outlet_tokens.token_amount', 'like', '%' . $search . '%')
-                        ->orWhere('outlets.name', 'like', '%' . $search . '%')
+                    $query->Where('outlets.name', 'like', '%' . $search . '%')
                         ->orWhere('gas_cylinders.name', 'like', '%' . $search . '%');
                 });
             })

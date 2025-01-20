@@ -78,6 +78,7 @@ class CustomerController extends Controller
         $search = $request->get('search');
         $status = $request->get('status');
         $isActive = $request->get('is_active', true);
+        $loggedInUserOutletId = auth()->user()->outlet_id;
 
         // Query users instead of outlets
         $users = User::select(
@@ -89,6 +90,7 @@ class CustomerController extends Controller
             'users.nic',
             'users.status',
             'users.isActive',
+            'users.verification_file',
             'outlets.Name as outlet_name',
             'outlets.id as outlet_id',
             'branches.name as branch_name'
@@ -96,6 +98,8 @@ class CustomerController extends Controller
             ->leftJoin('outlets', 'users.outlet_id', '=', 'outlets.id')
             ->leftJoin('branches', 'outlets.branch_id', '=', 'branches.id')
             ->where('role_id', '=', 4)
+            ->where('users.status', '=', "deactive")
+            ->where('users.outlet_id', '=', $loggedInUserOutletId)
             ->when($search, function ($query, $search) {
                 return $query->where(function ($query) use ($search) {
                     $query->where('users.name', 'like', '%' . $search . '%')
@@ -105,7 +109,7 @@ class CustomerController extends Controller
                 });
             })
             ->when($status, function ($query, $status) {
-                return $query->where('users.status', '=', 'deactivate');
+                return $query->where('users.status', '=', 'deactive');
             })
             ->when($isActive, function ($query, $isActive) {
                 return $query->where('users.isActive', '=', 1);
@@ -123,13 +127,24 @@ class CustomerController extends Controller
     }
     public function destroy(User $id)
     {
-     
         try {
             $id->update(['isActive' => 0]);
             return response()->json(['success' => 'Customer  deleted successfully!'], 200);
         } catch (\Exception $e) {
             // Return error response
             return response()->json(['error' => 'Failed to delete Customer '], 500);
+        }
+    }
+    public function updateCorporateCustomerStatus($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->update(['status' => 'active']);
+
+            return response()->json(['success' => 'Customer status updated successfully!'], 200);
+        } catch (\Exception $e) {
+            // Return error response
+            return response()->json(['error' => 'Failed to update customer status'], 500);
         }
     }
 

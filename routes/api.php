@@ -17,7 +17,7 @@ use App\Http\Controllers\TokenController;
 */
 
 Route::middleware('auth:sanctum')->group(function () {
- 
+
 });
 Route::post('/register', [AuthController::class, 'register'])->name('register.api');
 Route::post('/registerByAdmin', [AuthController::class, 'registerByAdmin'])->name('registerByAdmin.api');
@@ -25,3 +25,6 @@ Route::post('/registerByAdmin', [AuthController::class, 'registerByAdmin'])->nam
 Route::post('/login', [AuthController::class, 'login'])->name('login.api');
 
 Route::post('/issue-token', [TokenController::class, 'issueToken'])->name('api.issueToken');
+
+Route::get('/token-history/{id}', [TokenController::class, 'getTokenHistoryByID']);
+

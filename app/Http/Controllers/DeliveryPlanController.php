@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use App\Models\DeliveryPlan;
 use App\Models\Stock;
 use App\Models\GasCylinder;
+use App\Models\OutletToken;
+
+
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
@@ -68,7 +71,10 @@ class DeliveryPlanController extends Controller
 
     public function store(Request $request)
     {
+
+
         try {
+            DB::beginTransaction();
             $validatedData = $request->validate([
                 'DeliveryDate' => 'required|date|after_or_equal:today',
                 'QuantityPlanned' => 'required|integer|min:1',
@@ -77,15 +83,35 @@ class DeliveryPlanController extends Controller
                 'gas_cylinder_id' => 'required|exists:gas_cylinders,id',
             ]);
 
-
             DeliveryPlan::create([
                 'DeliveryDate' => $validatedData['DeliveryDate'],
                 'QuantityPlanned' => $validatedData['QuantityPlanned'],
                 'Status' => $validatedData['Status'],
                 'outlet_id' => $validatedData['OutletID'],
-                'cylinder_type_id' => $validatedData['gas_cylinder_id'],  
+                'cylinder_type_id' => $validatedData['gas_cylinder_id'],
             ]);
-            return response()->json(['success' => 'DeliveryPlan created successfully!']);
+
+            $outletToken = OutletToken::where('outlet_id', $validatedData['OutletID'])
+                ->where('cylinder_type_id', $validatedData['gas_cylinder_id'])
+                ->first();
+
+            if ($outletToken) {
+                $outletToken->increment('maxTokens', $validatedData['QuantityPlanned']);
+                $outletToken->increment('currentTokens', $validatedData['QuantityPlanned']);
+            } else {
+                OutletToken::create([
+                    'outlet_id' => $validatedData['OutletID'],
+                    'cylinder_type_id' => $validatedData['gas_cylinder_id'],
+                    'maxTokens' => $validatedData['QuantityPlanned'],
+                    'currentTokens' => $validatedData['QuantityPlanned'],
+                ]);
+            }
+
+            // Commit the transaction if everything was successful
+            DB::commit();
+
+            return response()->json(['success' => 'DeliveryPlan created and OutletToken updated successfully!']);
+
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -124,6 +150,10 @@ class DeliveryPlanController extends Controller
 
             $deliveryPlan->save();
 
+
+
+
+
             return response()->json(['success' => 'DeliveryPlan updated successfully!']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -153,8 +183,8 @@ class DeliveryPlanController extends Controller
             'outlets.Name as outlet_name',
             'gas_cylinders.name as gas_cylinder_name'
         )
-        ->leftJoin('outlets', 'delivery_plans.outlet_id', '=', 'outlets.id')
-        ->leftJoin('gas_cylinders', 'delivery_plans.cylinder_type_id', '=', 'gas_cylinders.id')
+            ->leftJoin('outlets', 'delivery_plans.outlet_id', '=', 'outlets.id')
+            ->leftJoin('gas_cylinders', 'delivery_plans.cylinder_type_id', '=', 'gas_cylinders.id')
             ->where('outlets.id', $userOutletIds) // Filter by the logged-in user's OutletID
             ->when($search, function ($query, $search) {
                 return $query->where(function ($query) use ($search) {
@@ -210,17 +240,17 @@ class DeliveryPlanController extends Controller
                     'outlet_id' => $outlet_id,
                     'gas_cylinder_id' => $gasCylinderId,
                     'isActive' => 1,
-                    'quantity'=>$request->QuantityReceived
+                    'quantity' => $request->QuantityReceived
                 ]);
-                
+
             }
 
             if ($request->Status === 'Discrepancy') {
-                 $adminEmail = 'admin@example.com'; // Replace with actual admin email
+                $adminEmail = 'admin@example.com'; // Replace with actual admin email
 
-                 $adminEmail = 'admin@example.com'; // Replace with the actual admin email
+                $adminEmail = 'admin@example.com'; // Replace with the actual admin email
 
-                 Mail::to($adminEmail)->send(new DiscrepancyNotification($deliveryPlan, $request->Notes));
+                Mail::to($adminEmail)->send(new DiscrepancyNotification($deliveryPlan, $request->Notes));
             }
 
             DB::commit();
