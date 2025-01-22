@@ -115,6 +115,11 @@
                                             @if(in_array($token->status, ['complete', 'canceled'])) disabled @endif>
                                             Update Status
                                         </button>
+                                        <button onclick="openModalReasign({{ $token }})"
+                                            class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+                                            @if(in_array($token->status, ['complete', 'canceled'])) disabled @endif>
+                                            Reassign Token
+                                        </button>
                                     </td>
                                 </tr>
 
@@ -245,10 +250,179 @@
 </div>
 
 
+<div id="tokenREassignModal" class="fixed inset-0 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/4">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h2 class="text-2xl font-bold text-gray-800">Token Details</h2>
+            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+
+        <!-- Current User Details -->
+        <div id="currentUserDetails" class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-3">Current User Details</h3>
+            <div class="space-y-2">
+                <div>
+                    <strong>User Name:</strong>
+                    <span id="currentUserName"></span>
+                </div>
+                <div>
+                    <strong>Contact Number:</strong>
+                    <span id="currentUserContact"></span>
+                </div>
+                <div>
+                    <strong>Email:</strong>
+                    <a href="mailto:currentuser@example.com" id="currentUserEmail"
+                        class="text-blue-500 hover:underline">
+
+                    </a>
+                </div>
+                <div class="mt-4">
+                    <label for="smsMessage" class="block font-medium text-gray-700 mb-1">Send SMS</label>
+                    <textarea id="smsMessage" rows="3" placeholder="Type your message here..."
+                        class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"></textarea>
+                    <button onclick="sendSMS()"
+                        class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                        Send SMS
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Select New User -->
+        <div id="newUserSection" class="mt-6">
+            <label for="newTokenUser" class="block font-medium text-gray-700 mb-1">Select New User</label>
+            <select id="newTokenUser" class="px-3 py-1 border border-gray-300 rounded-md w-full">
+                <option value="" disabled selected>Select a user...</option>
+                @foreach ($users as $user)
+                    <option value="{{ $user->id }}" data-name="{{ $user->name }}" data-contact="{{ $user->contact }}"
+                        data-email="{{ $user->email }}">
+                        {{ $user->name }}
+                    </option>
+                @endforeach
+            </select>
+
+
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-2 mt-6">
+            <div class="hidden"><strong>Token ID:</strong> <span id="modalTokenIdReassign"></span></div>
+
+            <div class="hidden"><strong>Token ID:</strong> <span id="currentUserId"></span></div>
+
+            <button onclick="assignNewUser()" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+                Save
+            </button>
+            <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+
 
 
 
 <script>
+
+    function sendSMS() {
+        const message = document.getElementById('smsMessage').value;
+        const contactNumber = document.getElementById('currentUserContact').innerText;
+
+        if (!message.trim()) {
+            alert("Please enter a message to send.");
+            return;
+        }
+
+        if (!contactNumber) {
+            alert("Contact number is not available.");
+            return;
+        }
+
+        $.ajax({
+            url: '/api/send-sms',
+            method: 'POST',
+            contentType: 'application/json',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            data: JSON.stringify({
+                contactNumber: contactNumber,
+                message: message
+            }),
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    document.getElementById('smsMessage').value = '';
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error sending SMS:', error);
+                alert('Failed to send SMS.');
+            }
+        });
+
+        document.getElementById('smsMessage').value = '';
+    }
+
+    function assignNewUser() {
+        const currentUserId = document.getElementById('currentUserId').value;
+        const newUserId = document.getElementById('newTokenUser').value;
+        const tokenId = document.getElementById('modalTokenIdReassign').innerText;
+
+
+
+        if (!newUserId) {
+            alert("Please select a new user.");
+            return;
+        }
+
+        if (newUserId === currentUserId) {
+            alert("The new user cannot be the same as the current user.");
+            return;
+        }
+
+
+
+        // AJAX request
+        $.ajax({
+            url: '/api/assign-newUser',
+            method: 'POST',
+            contentType: 'application/json',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            data: JSON.stringify({
+                newUserId: newUserId,
+                tokenId: tokenId
+            }),
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    window.location.reload();
+                }
+            },
+            error: function (xhr) {
+
+                var errors = xhr.responseJSON.errors;
+                console.log(errors);
+                if (errors) {
+                    for (var field in errors) {
+                        var errorMessage = errors[field].join(', ');
+                        $('#' + field).next('.error-message').remove(); // Remove previous error messages
+                        $('#' + field).after('<div class="error-message text-red-500">' + errorMessage + '</div>');
+                    }
+                } else {
+                    alert(xhr.responseJSON.error || 'An unexpected error occurred');
+                }
+            }
+        });
+    }
+
     let currentTokenId;
     function openCreateTokenModal() {
         document.getElementById('createTokenModal').classList.remove('hidden');
@@ -257,6 +431,25 @@
     function closeCreateTokenModal() {
         document.getElementById('createTokenModal').classList.add('hidden');
     }
+
+    function openModalReasign(token) {
+        console.log(token);
+        currentTokenId = token.id;
+
+        document.getElementById('currentUserName').innerText = token.user_name;
+
+        document.getElementById('currentUserId').innerText = token.user_id;
+        document.getElementById('currentUserEmail').href = `mailto:${token.email}`;
+
+        document.getElementById('currentUserEmail').innerText = token.email;
+        document.getElementById('currentUserContact').innerText = token.contact_number;
+
+        document.getElementById('modalTokenIdReassign').innerText = token.id;
+
+
+        document.getElementById('tokenREassignModal').classList.remove('hidden');
+    }
+
 
     function openModal(token) {
         currentTokenId = token.id;
@@ -356,7 +549,7 @@
         const userOutlet = document.getElementById('userOutlet').value;
         const tokenUser = document.getElementById('tokenUser').value;
         const gasCylinderType = document.getElementById('gasCylinderType').value;
-        
+
         $.ajax({
             url: "/api/issue-token",
             type: "POST",
@@ -365,7 +558,7 @@
                 "outlet_id": userOutlet,
                 "cylinder_type_id": gasCylinderType
             }),
-            contentType: "application/json", 
+            contentType: "application/json",
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },

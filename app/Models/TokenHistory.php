@@ -23,6 +23,7 @@ class TokenHistory extends Authenticatable
         'currentStatus',
         'updateStatus',
         'reason',
+        'created_at'
     ];
 
     /**

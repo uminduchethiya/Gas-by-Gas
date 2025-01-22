@@ -50,7 +50,7 @@
                     </a>
                     <div class="flex flex-row gap-2 md:mt-4">
                         <i class='text-white w-6 h-6'>
-                            <?xml version="1.0" ?><!DOCTYPE svg  PUBLIC ' -//W3C//DTD SVG
+                            <!DOCTYPE svg  PUBLIC ' -//W3C//DTD SVG
                             1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg height="100%"
                                 style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"
                                 version="1.1" viewBox="0 0 512 512" width="100%" xml:space="preserve"
@@ -62,7 +62,7 @@
                             </svg>
                         </i>
                         <i class='text-white w-6 h-6'>
-                            <?xml version="1.0" ?>
+                            
                             <!DOCTYPE svg
                                 PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg
                                 height="100%"
@@ -81,7 +81,7 @@
                             </svg>
                         </i>
                         <i class='text-white w-6 h-6'>
-                            <?xml version="1.0" ?>
+                            
                             <!DOCTYPE svg
                                 PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg
                                 height="100%"

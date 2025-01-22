@@ -10,6 +10,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\DeliveryPlanController;
+use App\Http\Controllers\StockController;
+
+
+
 
 use Illuminate\Support\Facades\Route;
 
@@ -26,18 +30,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Route::get('/login-view', [AuthController::class, 'loginview'])->name('login');
 Route::get('/register-view', [AuthController::class, 'registeview'])->name('register.view');
 Route::get('/home', [UserController::class, 'home_view'])->name('home');
-Route::get('/aboutus',[UserController::class, 'aboutus_view'])->name('aboutus');
-Route::get('/contactus',[UserController::class, 'countacus_view'])->name('contactus');
-Route::get('/token-view',[TokenController::class, 'tokenView'])->name('tokenview');
+Route::get('/aboutus', [UserController::class, 'aboutus_view'])->name('aboutus');
+Route::get('/contactus', [UserController::class, 'countacus_view'])->name('contactus');
+Route::get('/token-view', [TokenController::class, 'tokenView'])->name('tokenview');
 // Route group for USER role
 Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function () {
-    
+
 });
 
 Route::middleware(['auth:web'])->group(function () {
@@ -91,10 +95,17 @@ Route::middleware(['auth:web'])->group(function () {
             Route::post('/customer', [CustomerController::class, 'store'])->name('customer.store');
             Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
 
+            Route::get('/tokenHistory/{id}', [CustomerController::class, 'Customertokens'])->name('tokenHistory');
+            Route::get('/tokenHistoryList/{id}', [CustomerController::class, 'TokenHistory'])->name('tokenHistoryList');
+
+
+
+
             Route::get('/CoparateCustomers', [CustomerController::class, 'Coparateindex'])->name('CoparateCustomers.Coparateindex');
             Route::get('/updateCopareateCustomerStatus/{id}', [CustomerController::class, 'updateCorporateCustomerStatus'])->name('CoparateCustomers.updateCopareateCustomerStatus');
 
-            
+
+            Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
 
 
         });

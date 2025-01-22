@@ -20,15 +20,20 @@ class TwilioSmsService
     {
         try {
             $from = env('TWILIO_PHONE_NUMBER'); 
-            $message = $this->twilio->messages->create($to, [
-                'from' => $from,
-                'body' => $body,
-            ]);
+            // $message = $this->twilio->messages->create($to, [
+            //     'from' => $from,
+            //     'body' => $body,
+            // ]);
 
+            // return [
+            //     'success' => true,
+            //     'messageSid' => $message->sid,
+            //     'status' => $message->status,
+            // ];
             return [
                 'success' => true,
-                'messageSid' => $message->sid,
-                'status' => $message->status,
+                'messageSid' => '',
+                'status' => '',
             ];
         } catch (\Exception $e) {
             return [
