@@ -7,6 +7,7 @@ use App\Models\Outlet;
 use App\Models\OutletToken;
 use App\Models\Token;
 use App\Models\TokenHistory;
+use App\Models\Stock;
 
 use App\Models\User;
 
@@ -41,7 +42,10 @@ class TokenController extends Controller
             'tokens.description',
             'tokens.expires_at',
             'gas_cylinders.name as gas_cylinder_name',
-            'users.name as user_name'
+            'users.name as user_name',
+            'users.id as user_id',
+            'users.contact_number as contact_number',
+            'users.email as email',
         )
             ->leftJoin('gas_cylinders', 'tokens.cylinder_type_id', '=', 'gas_cylinders.id')
             ->leftJoin('users', 'tokens.user_id', '=', 'users.id')
@@ -62,8 +66,12 @@ class TokenController extends Controller
             ->orderBy($sortBy, $sortDirection)
             ->paginate(10);
 
+
+
+
         $users = User::where('isActive', 1)
-            ->where('role_id', '=', 3)
+            ->where('role_id', 3)
+            ->where('outlet_id', $loggedInUserOutletId)
             ->get();
 
 
@@ -94,6 +102,33 @@ class TokenController extends Controller
                 return response()->json(['error' => 'A reason is required when canceling a token'], 422);
             }
 
+
+            if ($request->status === Token::STATUS_COMPLETE) {
+
+                $currentStock = Stock::where('gas_cylinder_id', $token->cylinder_type_id)
+                    ->where('quantity', '>', 0)
+                    ->orderBy('id')
+                    ->first();
+
+                if ($currentStock) {
+
+                    $currentStock->quantity -= 1;
+                    $currentStock->save();
+                } else {
+                    return response()->json(['error' => 'No stock available for selecte cilinder type'], 404);
+                }
+            }
+            if ($request->status === Token::STATUS_CANCELED) {
+               
+
+                $stock = OutletToken::where('outlet_id', $token->outlet_id)
+                    ->where('cylinder_type_id', $token->cylinder_type_id)
+                    ->first();
+                if ($stock) {
+                    $stock->increment(column: 'currentTokens');
+                }
+            }
+
             $user = $token->user;
             if (!$user || !$user->contact_number) {
                 return response()->json(['error' => 'User contact number not found'], 404);
@@ -104,6 +139,9 @@ class TokenController extends Controller
             if (!str_starts_with($userContactNumber, $countryCode)) {
                 $userContactNumber = $countryCode . ltrim($userContactNumber, '0');
             }
+
+
+
             TokenHistory::create([
                 'token_id' => $token->id,
                 'currentStatus' => $token->status,
@@ -112,7 +150,6 @@ class TokenController extends Controller
                 'updated_by' => Auth::id(),
             ]);
 
-            // Update token status
             $token->status = $request->status;
             $token->save();
 
@@ -130,9 +167,7 @@ class TokenController extends Controller
             if (!$smsResponse['success']) {
                 throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
             }
-
             DB::commit();
-
             return response()->json(['message' => 'Token status updated successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -182,7 +217,7 @@ class TokenController extends Controller
                 return response()->json(['error' => 'No tokens are available for this cylinder type at the selected branch.'], 400);
             }
 
-            $branchToken->decrement('currentTokens');
+            $branchToken->decrement(column: 'currentTokens');
 
             $tokenCode = Str::uuid()->toString();
             $expiresAt = now()->addDays(14);
@@ -267,21 +302,85 @@ class TokenController extends Controller
     }
 
     public function tokenView()
-    {  
-        // Fetch all outlets
+    {
         $outlets = Outlet::all();
-    
-        // Fetch all active gas cylinders
+
         $gasCylinders = GasCylinder::where('isActive', true)->get();
-    
-        // Get the logged-in user's ID
+
         $loggedInUserId = auth()->id();
-    
-        // Assume `auth()->user()->outlet_id` holds the currently assigned outlet for the user
+
         $assignedOutletId = auth()->user()->outlet_id;
-    
+
         return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId'));
     }
-    
-    
+    public function assignNewUserToToken(Request $request, TwilioSmsService $smsService)
+    {
+        $request->validate([
+            'newUserId' => 'required|exists:users,id', // Validate the new user ID
+            'tokenId' => 'required|exists:tokens,id', // Validate the token ID
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $token = Token::findOrFail($request->tokenId);
+
+            if ($token->user_id === (int) $request->newUserId) {
+                return response()->json(['error' => 'The new user cannot be the same as the current user.'], 422);
+            }
+
+
+            $activeTokensCount = Token::where('user_id', $request->newUserId)
+                ->whereIn('status', [Token::STATUS_PENDING, Token::STATUS_SCHEDULED])
+                ->count();
+
+            if ($activeTokensCount >= 2) {
+                return response()->json(['error' => 'You cannot have more than 2 active tokens.'], 400);
+            }
+            $newUser = User::findOrFail($request->newUserId);
+
+
+            $countryCode = '+94';
+            $userContactNumber = $newUser->contact_number;
+
+            if (!str_starts_with($userContactNumber, $countryCode)) {
+                $userContactNumber = $countryCode . ltrim($userContactNumber, '0');
+            }
+
+            // Update the token's user
+            $previousUserId = $token->user_id;
+            $token->user_id = $newUser->id;
+            $token->save();
+
+            TokenHistory::create([
+                'token_id' => $token->id,
+                'currentStatus' => $token->status,
+                'updateStatus' => Token::STATUS_REASIGNED,
+                'reason' => 'User reassigned to another user',
+                'updated_by' => Auth::id(),
+            ]);
+
+            $message = "Dear {$newUser->name}, you have been assigned a new token (ID: {$token->id}). Please check your dashboard for details.";
+            $smsResponse = $smsService->sendSms($userContactNumber, $message);
+
+            if (!$smsResponse['success']) {
+                throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User reassigned successfully and SMS notification sent.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to reassign user to token.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

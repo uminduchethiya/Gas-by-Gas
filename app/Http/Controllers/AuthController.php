@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+
 
 class AuthController extends Controller
 {
@@ -136,7 +138,6 @@ class AuthController extends Controller
     public function registerByAdmin(Request $request)
     {
         try {
-            // Validate the request data
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
@@ -171,7 +172,7 @@ class AuthController extends Controller
                 'outlet_id' => $request->outlet,
                 'is_organization' => $isOrganization,
                 'verification_file' => $verificationFilePath,
-                'status' => $isOrganization ? 'deactive' : 'active', 
+                'status' => $isOrganization ? 'deactive' : 'active',
             ]);
 
             return response()->json(['success' => 'Customer created successfully!']);
@@ -184,4 +185,47 @@ class AuthController extends Controller
         }
 
     }
+    public function updateCustomer(Request $request)
+    {
+        try {
+
+            // Validate incoming data
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,' . $request->id,
+                'contact_number' => 'nullable|string',
+                'address' => 'nullable|string',
+                'nic' => 'nullable|string|unique:users,nic,' . $request->id,
+                'outlet' => 'required|exists:outlets,id',
+
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $user = User::findOrFail($request->id);
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'contact_number' => $request->contact_number,
+                'address' => $request->address,
+                'nic' => $request->nic,
+                'outlet_id' => $request->outlet,
+
+            ]);
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+                $user->save();
+            }
+
+            return response()->json(['success' => 'Customer updated successfully!']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            dd($e);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 }

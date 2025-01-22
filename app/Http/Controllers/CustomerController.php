@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Outlet;
 use App\Models\User;
-use App\Models\GasCylinder;
+use App\Models\Token;
 
 
 use App\Models\TokenHistory;
@@ -43,7 +43,8 @@ class CustomerController extends Controller
         )
             ->leftJoin('outlets', 'users.outlet_id', '=', 'outlets.id')
             ->leftJoin('branches', 'outlets.branch_id', '=', 'branches.id')
-            ->where('role_id', '=', 3)
+            ->whereIn('role_id', [3, 4])
+
             ->when($search, function ($query, $search) {
                 return $query->where(function ($query) use ($search) {
                     $query->where('users.name', 'like', '%' . $search . '%')
@@ -146,6 +147,70 @@ class CustomerController extends Controller
             // Return error response
             return response()->json(['error' => 'Failed to update customer status'], 500);
         }
+    }
+    public function Customertokens(Request $request, $userId)
+    {
+        // Default sort parameters
+        $sortBy = $request->get('sort_by', 'id');
+        $sortDirection = $request->get('sort_direction', 'asc');
+        $search = $request->get('search');
+        $status = $request->get('status');
+        $isActive = $request->get('is_active', true);
+
+        // Query tokens for the specific user
+        $tokens = Token::select(
+            'tokens.id',
+            'tokens.status',
+            'tokens.isActive',
+            'tokens.description',
+            'tokens.expires_at',
+            'tokens.token_code',
+            'users.name as username',
+            'gas_cylinders.name as cylinder_name',
+            'outlets.Name as outlet_name'
+        )
+            ->leftJoin('users', 'tokens.user_id', '=', 'users.id')
+            ->leftJoin('gas_cylinders', 'tokens.cylinder_type_id', '=', 'gas_cylinders.id')
+            ->leftJoin('outlets', 'tokens.outlet_id', '=', 'outlets.id')
+            ->where('tokens.user_id', '=', $userId)
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($query) use ($search) {
+                    $query->where('tokens.description', 'like', '%' . $search . '%')
+                        ->orWhere('users.name', 'like', '%' . $search . '%')
+                        ->orWhere('gas_cylinders.name', 'like', '%' . $search . '%')
+                        ->orWhere('outlets.Name', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($status, function ($query, $status) {
+                return $query->where('tokens.status', '=', $status);
+            })
+            ->when($isActive, function ($query, $isActive) {
+                return $query->where('tokens.isActive', '=', 1);
+            })
+            ->orderBy('tokens.' . $sortBy, $sortDirection) // Dynamic sorting
+            ->paginate(10);
+
+        return view('manager.Customers.tokenHistory', [
+            'tokens' => $tokens,
+            'sortBy' => $sortBy,
+            'sortDirection' => $sortDirection,
+        ]);
+    }
+    public function TokenHistory(Request $request, $tokenid)
+    {
+
+        
+        $tokenHistory = TokenHistory::where('token_id', $tokenid)->get();
+
+        if ($tokenHistory->isEmpty()) {
+            return response()->json(['message' => 'No token history found.'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'tokenHistory' => $tokenHistory
+        ]);
+
     }
 
 }

@@ -20,6 +20,10 @@ class Token extends Model
     public const STATUS_REASIGNED = 'reasigned';
     public const STATUS_CYLINDER_RECEIVED = 'cylinder_received';
     public const STATUS_PAYMENT_COMPLETE = 'payment_complete';
+    public const STATUS_COMPLETE = 'completed';
+
+
+    
 
     // Define the relationship with the User model
     public function user()
