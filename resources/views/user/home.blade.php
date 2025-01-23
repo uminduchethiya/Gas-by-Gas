@@ -67,58 +67,82 @@
             <div
                 class="section1 md:flex md:flex-wrap items-start gap-6 md:gap-12 p-6 bg-gradient-to-br from-gray-100 to-white font-boogaloo">
                 <!-- About Us Section -->
-                <section class="flex-1 p-6 md:p-10 order-2 md:order-1">
-                    <em class="text-text-light text-2xl  font-bold uppercase tracking-wide block mb-4">About Us</em>
-                    <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-6 leading-tight">
-                        We Help You <span class="text-text-dark">Keep Your Place Clean</span>
-                    </h1>
-                    <p class="text-gray-600 text-sm md:text-lg leading-relaxed mb-6">
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                        industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                        and scrambled it to make a type specimen book. It has survived not only five centuries, but also the
-                        leap into electronic typesetting, remaining essentially unchanged.
-                    </p>
-                    <p class="text-gray-600 text-sm md:text-lg leading-relaxed mb-6">
-                        It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-                        and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem
-                        Ipsum.
-                    </p>
-                    <em class="text-yellow-700 font-medium text-lg block">It is a long established fact</em>
+                <section class="flex-1 p-6 md:p-10 order-2 md:order-1"> <em
+                        class="text-text-light text-2xl font-bold uppercase tracking-wide block mb-4">About Us</em>
+                    <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-6 leading-tight"> We Help You <span
+                            class="text-text-dark">Stay Powered Safely</span> </h1>
+                    <p class="text-gray-600 text-sm md:text-lg leading-relaxed mb-6"> GasByGas is a trusted LP gas
+                        distributor established in Sri Lanka, committed to providing island-wide gas distribution and
+                        tracking services. With several registered outlet shops and service centers across all districts, we
+                        ensure a reliable supply of gas to meet your daily and industrial needs. </p>
+                    <p class="text-gray-600 text-sm md:text-lg leading-relaxed mb-6"> Our innovative online gas requesting
+                        and delivery system is designed to make the process seamless for end consumers. Whether you're an
+                        individual or a business, our platform enables you to request gas from the nearest outlet, track
+                        your token, and receive timely updates for pickups and deliveries. </p>
+                    <em class="text-yellow-700 font-medium text-lg block"> Keeping your home and business running smoothly
+                        is our priority. </em>
                 </section>
 
                 <!-- Booking Form Section -->
-                <section class="flex-1 p-6 md:p-10 order-1 md:order-2">
-                    <form id="form" class="bg-white p-8 md:p-10 rounded-xl shadow-2xl border border-gray-200">
-                        <h2 class="text-xl md:text-2xl font-semibold text-center text-gray-800 mb-8">Book a Service</h2>
-                        <fieldset class="mb-6">
-                            <label for="fname" class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
-                            <input type="text" name="fname" id="fname" maxlength="60"
-                                class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition" />
-                        </fieldset>
-                        <fieldset class="mb-6">
-                            <label for="cno" class="block text-sm font-medium text-gray-700 mb-2">Contact
-                                Number</label>
-                            <input type="tel" name="cno" maxlength="15"
-                                class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition" />
-                        </fieldset>
-                        <fieldset class="mb-6">
-                            <label for="zip" class="block text-sm font-medium text-gray-700 mb-2">Zip Code</label>
-                            <input type="tel" name="zip" maxlength="8"
-                                class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition" />
-                        </fieldset>
-                        <fieldset class="mb-8">
-                            <label for="service" class="block text-sm font-medium text-gray-700 mb-2">Choose a
-                                Service</label>
-                            <select name="service" id="service"
+                <section class="flex-1  order-1 md:order-2">
+                    <form id="form" method="POST" action="{{ route('api.issueToken') }}"
+                        class="">
+                        @csrf
+                        <h1 class="text-2xl  md:text-4xl font-bold text-gray-800  leading-tight   ">
+                            Token <span class="text-text-dark">Request</span> <span class="text-text-dark">Form</span>
+                        </h1>
+
+                        <!-- Hidden input for the logged-in user's ID -->
+                        <input type="hidden" name="user_id" value="{{ $loggedInUserId }}">
+                        <input type="hidden" name="token" value="{{ $assignedStatus }}">
+
+                        <!-- Outlet Selection -->
+                        <fieldset class="mb-8  px-4 md:px-8">
+                            <label for="outlet" class="block text-sm font-medium text-gray-700 mb-2">Choose a
+                                Outlet</label>
+                            <select name="outlet_id" id="outlet"
                                 class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition">
-                                <option value="1">Residential Cleaning</option>
-                                <option value="2">Commercial Cleaning</option>
-                                <option value="3">Other</option>
+                                <option value="" disabled selected>-- Select an Outlet --</option>
+                                @foreach ($outlets as $outlet)
+                                    <option value="{{ $outlet->id }}"
+                                        {{ $assignedOutletId == $outlet->id ? 'selected' : '' }}>
+                                        {{ $outlet->Name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </fieldset>
-                        <fieldset>
-                            <button id="form_btn"
-                                class="w-full bg-yellow-500 text-white font-medium py-3 rounded-lg hover:bg-yellow-600 hover:shadow-lg transition">
+
+                        <!-- Cylinder Type Selection -->
+                        <fieldset class="mb-8 p px-4 md:px-8">
+                            <label for="cylinder_type" class="block text-sm font-medium text-gray-700 mb-2">Choose a
+                                Cylinder
+                                Type</label>
+                            <select name="cylinder_type_id" id="cylinder_type"
+                                class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition">
+                                <option value="" disabled selected>-- Select a Cylinder Type --</option>
+                                @foreach ($gasCylinders as $cylinder)
+                                    <option value="{{ $cylinder->id }}">{{ $cylinder->name }}</option>
+                                @endforeach
+                            </select>
+                        </fieldset>
+
+                        <!-- Gas Cylinder Quantity Input (Conditionally Rendered) -->
+                        @if ($assignedStatus == 4)
+                            <fieldset class="mb-8  px-4 md:px-8">
+                                <label for="cylinder_quantity" class="block text-sm font-medium text-gray-700 mb-2">Gas
+                                    Cylinder
+                                    Quantity</label>
+                                <input type="number" name="cylinder_quantity" id="cylinder_quantity"
+                                    class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition"
+                                    placeholder="Enter cylinder quantity" min="1">
+                            </fieldset>
+                        @endif
+
+
+                        <!-- Submit Button -->
+                        <fieldset class="flex justify-center">
+                            <button type="submit"
+                                class="w-auto px-3 items-center justify-center bg-yellow-500 text-white font-medium py-3 rounded-lg hover:bg-yellow-600 hover:shadow-lg transition">
                                 Submit Details
                             </button>
                         </fieldset>
@@ -127,89 +151,77 @@
             </div>
 
             {{-- our Proceess section --}}
-            <div class="section2 font-boogaloo relative bg-cover bg-no-repeat text-white py-12 px-4 md:px-8"
-                style="background-image: linear-gradient(to right, rgba(31, 28, 88, 0.8) 10%, rgba(31, 28, 88, 0.8) 50%, rgba(31, 28, 88, 0.8) 100%),">
+            <div class="section2 font-boogaloo relative bg-cover bg-no-repeat text-white py-12 px-4 md:px-8">
                 <h1 class="text-2xl p-6 md:text-4xl font-bold text-gray-800 mb-6 leading-tight">
                     OUR <span class="text-text-dark">PROCESS</span>
                 </h1>
                 <div class="flex flex-wrap md:flex-nowrap justify-center items-start p-6 gap-8">
-                    <!-- Card 1 -->
+                    <!-- Step 1 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex max-w-[20rem] flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
-                            <img src="https://i.postimg.cc/J7yFYNtr/01.png" alt="Service"
+                            <img src="https://i.postimg.cc/J7yFYNtr/01.png" alt="Register"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                             <div class="absolute w-[90%] h-[50px] bg-contain bg-center bg-no-repeat top-[-20px] animate-bounce"
                                 style="background-image: url('https://i.postimg.cc/7LBXbLm6/arrow.png')"></div>
                         </figure>
                         <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
-                            Pick a <em class="text-white">service</em>
+                            <em class="text-white">Register</em>
                         </h2>
-                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
-                            needs.</p>
+                        <p class="text-white mt-2">
+                            Create an account by providing your NIC, phone number, and email for personalized gas requests.
+                        </p>
                     </div>
 
-                    <!-- Card 2 -->
+                    <!-- Step 2 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex max-w-[20rem]  flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
-                            <img src="https://i.postimg.cc/jSTkjBc2/02.png" alt="Schedule"
+                            <img src="https://i.postimg.cc/jSTkjBc2/02.png" alt="Request Gas"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                             <div class="absolute w-[90%] h-[50px] bg-contain bg-center bg-no-repeat top-[-20px] animate-bounce"
                                 style="background-image: url('https://i.postimg.cc/7LBXbLm6/arrow.png')"></div>
                         </figure>
                         <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
-                            Pick a <em class="text-white">service</em>
+                            <em class="text-white">Request Gas</em>
                         </h2>
-                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
-                            needs.</p>
+                        <p class="text-white mt-2">
+                            Select the nearest outlet and request your gas cylinder. A token will be issued with the
+                            expected
+                            pickup period.
+                        </p>
                     </div>
 
-                    <!-- Card 2 -->
+                    <!-- Step 3 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex max-w-[20rem] flex-col items-center text-center p-11 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
-                            <img src="https://i.postimg.cc/jSTkjBc2/02.png" alt="Schedule"
+                            <img src="https://i.postimg.cc/FKsWyc2Q/03.png" alt="Receive Updates"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                             <div class="absolute w-[90%] h-[50px] bg-contain bg-center bg-no-repeat top-[-20px] animate-bounce"
                                 style="background-image: url('https://i.postimg.cc/7LBXbLm6/arrow.png')"></div>
                         </figure>
                         <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
-                            Pick a <em class="text-white">service</em>
+                            <em class="text-white">Receive Updates</em>
                         </h2>
-                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
-                            needs.</p>
+                        <p class="text-white mt-2">
+                            Get SMS or email notifications about your token status and delivery updates.
+                        </p>
                     </div>
 
-                    <!-- Card 2 -->
+                    <!-- Step 4 -->
                     <div
-                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                        class="flex max-w-[20rem] flex-col items-center text-center p-11 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
                         <figure class="relative">
-                            <img src="https://i.postimg.cc/jSTkjBc2/02.png" alt="Schedule"
-                                class="brightness-0 invert w-16 h-16" loading="lazy">
-                            <div class="absolute w-[90%] h-[50px] bg-contain bg-center bg-no-repeat top-[-20px] animate-bounce"
-                                style="background-image: url('https://i.postimg.cc/7LBXbLm6/arrow.png')"></div>
-                        </figure>
-                        <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
-                            Pick a <em class="text-white">service</em>
-                        </h2>
-                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
-                            needs.</p>
-                    </div>
-
-
-                    <!-- Card 3 -->
-                    <div
-                        class="flex flex-col items-center text-center p-8 bg-[#2E2303] bg-opacity-90 rounded-lg shadow-lg relative transform hover:scale-105 transition-transform duration-300">
-                        <figure class="relative">
-                            <img src="https://i.postimg.cc/FKsWyc2Q/03.png" alt="Done"
+                            <img src="https://i.postimg.cc/J7yFYNtr/04.png" alt="Pickup Gas"
                                 class="brightness-0 invert w-16 h-16" loading="lazy">
                         </figure>
                         <h2 class="text-lg font-semibold mt-4 text-[#eab308]">
-                            Pick a <em class="text-white">service</em>
+                            <em class="text-white">Pickup Gas</em>
                         </h2>
-                        <p class="text-white mt-2">Choose from our range of professional services tailored to meet your
-                            needs.</p>
+                        <p class="text-white mt-2">
+                            Visit the outlet on the scheduled date with your token to collect your gas cylinder.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -217,11 +229,11 @@
 
             <!--Why Choose Us Section-->
             <div
-                class="section4 font-boogaloo  flex flex-col md:flex-row gap-12 p-10 bg-gradient-to-br from-yellow-100 via-white to-gray-50">
+                class="section4 font-boogaloo flex flex-col md:flex-row gap-12 p-10 bg-gradient-to-br from-yellow-100 via-white to-gray-50">
                 <!-- Image Section -->
                 <section class="relative flex-1 flex items-center justify-center">
                     <figure class="relative w-full max-w-md overflow-hidden rounded-lg shadow-xl">
-                        <img src="https://i.postimg.cc/YSnXb0HL/05.jpg" alt="Years of experience"
+                        <img src="{{ asset('images/contacus.jpg') }}" alt="Years of experience"
                             class="w-full transform -scale-x-100 transition-transform duration-500 hover:scale-105" />
                         <span
                             class="absolute top-4 right-4 bg-white shadow-md rounded-lg text-center p-4 z-10 animate-bounce">
@@ -238,29 +250,36 @@
                         We Provide <span class="text-text-light">Top-notch Services</span> for Your Needs!
                     </h1>
                     <p class="text-gray-600 text-lg">
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                        industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                        and scrambled it to make a type specimen book.
+                        We take pride in offering premium solutions tailored to meet your unique requirements. Our team of
+                        dedicated experts works around the clock to ensure that every service we provide exceeds
+                        expectations. With our years of experience and commitment to excellence, we are the trusted partner
+                        for many individuals and businesses.
                     </p>
                     <ul class="space-y-4">
                         <li class="flex items-start gap-3">
                             <i class="fas fa-check-circle text-text-light text-2xl"></i>
-                            <span class="text-gray-700 text-lg">Lorem Ipsum has been the industry's standard dummy text
-                                ever since the 1500s.</span>
+                            <span class="text-gray-700 text-lg">Over 5 years of experience in delivering exceptional
+                                services.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-check-circle text-text-light text-2xl"></i>
-                            <span class="text-gray-700 text-lg">When an unknown printer took a galley of type and scrambled
-                                it to make a type specimen book.</span>
+                            <span class="text-gray-700 text-lg">Proven track record of customer satisfaction and
+                                reliability.</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <i class="fas fa-check-circle text-text-light text-2xl"></i>
-                            <span class="text-gray-700 text-lg">It has survived not only five centuries but also the leap
-                                into electronic typesetting.</span>
+                            <span class="text-gray-700 text-lg">Constant innovation and adoption of industry-leading
+                                technologies.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-text-light text-2xl"></i>
+                            <span class="text-gray-700 text-lg">A customer-centric approach ensuring your needs are our top
+                                priority.</span>
                         </li>
                     </ul>
                 </section>
             </div>
+
 
             {{-- Contact Us Section --}}
             <div class="section5 font-boogaloo  relative">
@@ -280,7 +299,7 @@
 
                 <!-- Decorative image (adjust position for better UX) -->
                 <div class="absolute right-0 top-1/4 h-full w-1/5 bg-no-repeat bg-cover"
-                    style="background-image: url('https://i.postimg.cc/yNvhsbQM/0.png'); pointer-events: none;"></div>
+                    style="background-image: url('{{ asset('images/homecontact.png') }}'); pointer-events: none;"></div>
             </div>
 
 
