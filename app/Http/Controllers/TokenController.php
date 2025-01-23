@@ -191,14 +191,6 @@ class TokenController extends Controller
             'user_id' => 'required|exists:users,id',
             'outlet_id' => 'required|exists:outlets,id',
             'cylinder_type_id' => 'required|exists:gas_cylinders,id',
-            'cylinder_quantity' => 'nullable|integer|min:1',
-        ]);
-
-
-
-        // If validation fails, return the error messages
-
-            // Conditional validation for cylinder_quantity based on user role
             'cylinder_quantity' => [
                 function ($attribute, $value, $fail) use ($user) {
                     if ($user->role_id == 4 && (empty($value) || $value < 1)) {
@@ -211,7 +203,6 @@ class TokenController extends Controller
                 },
             ],
         ]);
-
         // If validation fails, return error messages
 
         if ($validator->fails()) {
