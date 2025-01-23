@@ -161,7 +161,7 @@
                 <select id="tokenUser" class="px-3 py-1 border border-gray-300 rounded-md w-full" required>
                     <option value="" disabled selected>Select a user...</option>
                     @foreach ($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        <option data-role="{{$user->role_id}}" value="{{ $user->id }}">{{ $user->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -175,6 +175,12 @@
                     @endforeach
                 </select>
             </div>
+
+            <div class="mb-4">
+                <label for="GasQty" class="block font-medium text-gray-700 mb-1">Gas Cylinder Qty</label>
+                <input id="GasQty" class="px-3 py-1 border border-gray-300 rounded-md w-full" type="number" min="1">
+            </div>
+
 
             <!-- Action Buttons -->
             <div class="flex justify-end space-x-2 mt-4">
@@ -326,7 +332,27 @@
 
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const userSelect = document.getElementById("tokenUser");
+        const gasQtyInput = document.getElementById("GasQty");
 
+        function handleUserRoleChange() {
+            const selectedOption = userSelect.options[userSelect.selectedIndex];
+            const role = selectedOption.getAttribute("data-role");
+
+            if (role === "3") {
+                gasQtyInput.value = 1;
+                gasQtyInput.disabled = true;
+            } else {
+                gasQtyInput.disabled = false;
+                gasQtyInput.value = "";
+            }
+        }
+
+        handleUserRoleChange();
+
+        userSelect.addEventListener("change", handleUserRoleChange);
+    });
     function sendSMS() {
         const message = document.getElementById('smsMessage').value;
         const contactNumber = document.getElementById('currentUserContact').innerText;
@@ -545,18 +571,51 @@
     }
 
     function createToken() {
-
         const userOutlet = document.getElementById('userOutlet').value;
         const tokenUser = document.getElementById('tokenUser').value;
         const gasCylinderType = document.getElementById('gasCylinderType').value;
+        const gasQtyInput = document.getElementById("GasQty").value;
+
+        document.querySelectorAll('.error-message').forEach(el => el.remove());
+
+        let isValid = true;
+
+        if (!userOutlet) {
+            isValid = false;
+            const element = document.getElementById('userOutlet');
+            element.insertAdjacentHTML('afterend', '<div class="error-message text-red-500">Please select an outlet.</div>');
+        }
+
+        if (!tokenUser) {
+            isValid = false;
+            const element = document.getElementById('tokenUser');
+            element.insertAdjacentHTML('afterend', '<div class="error-message text-red-500">Please select a user.</div>');
+        }
+
+        if (!gasCylinderType) {
+            isValid = false;
+            const element = document.getElementById('gasCylinderType');
+            element.insertAdjacentHTML('afterend', '<div class="error-message text-red-500">Please select a gas cylinder type.</div>');
+        }
+
+        if (!gasQtyInput || gasQtyInput < 1) {
+            isValid = false;
+            const element = document.getElementById('GasQty');
+            element.insertAdjacentHTML('afterend', '<div class="error-message text-red-500">Please enter a valid quantity (minimum 1).</div>');
+        }
+
+        if (!isValid) {
+            return;
+        }
 
         $.ajax({
-            url: "/api/issue-token",
+            url: "/api/issue-token-api",
             type: "POST",
             data: JSON.stringify({
                 "user_id": tokenUser,
                 "outlet_id": userOutlet,
-                "cylinder_type_id": gasCylinderType
+                "cylinder_type_id": gasCylinderType,
+                "cylinder_quantity": gasQtyInput // Include quantity
             }),
             contentType: "application/json",
             headers: {
@@ -564,14 +623,12 @@
             },
             success: function (response) {
                 if (response.success) {
-                    alert(response.success);
+                    alert(response.message);
                     window.location.reload();
                 }
             },
             error: function (xhr) {
-
                 var errors = xhr.responseJSON.errors;
-                console.log(errors);
                 if (errors) {
                     for (var field in errors) {
                         var errorMessage = errors[field].join(', ');
