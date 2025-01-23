@@ -203,7 +203,6 @@ class TokenController extends Controller
                 },
             ],
         ]);
-
         // If validation fails, return error messages
 
         if ($validator->fails()) {
