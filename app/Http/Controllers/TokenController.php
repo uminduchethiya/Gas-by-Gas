@@ -362,14 +362,24 @@ class TokenController extends Controller
                 'updated_by' => Auth::id(),
             ]);
 
-            $message = "Dear {$newUser->name}, you have been assigned a new token (ID: {$token->id}). Please check your dashboard for details.";
-            $smsResponse = $smsService->sendSms($userContactNumber, $message);
+            $originalUser = User::findOrFail($token->user_id);
+            $originalUserName = $originalUser->name;
+            $originalUserContactNumber = $originalUser->contact_number;
 
-            if (!$smsResponse['success']) {
-                throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
+        
+            if (!str_starts_with($originalUserContactNumber, $countryCode)) {
+                $originalUserContactNumber = $countryCode . ltrim($originalUserContactNumber, '0');
             }
 
             DB::commit();
+
+            $originalUserContactNumber = "Dear {$originalUserName}, your token assing to new user. Please contact outlet for more details.";
+            $smsResponse = $smsService->sendSms($originalUserContactNumber, $originalUserContactNumber);
+
+            $message = "Dear {$newUser->name}, you have been assigned a new token (ID: {$token->id}). Please check your dashboard for details.";
+            $smsResponse = $smsService->sendSms($userContactNumber, $message);
+
+
 
             return response()->json([
                 'success' => true,

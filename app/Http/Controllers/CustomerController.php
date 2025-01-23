@@ -11,6 +11,8 @@ use App\Models\Token;
 use App\Models\TokenHistory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CoparateCustomerAproval;
 
 class CustomerController extends Controller
 {
@@ -141,11 +143,15 @@ class CustomerController extends Controller
         try {
             $user = User::findOrFail($id);
             $user->update(['status' => 'active']);
+            $loginUrl = url('/login-view');
+          
+            Mail::to($user->email)->send(new CoparateCustomerAproval($user, $loginUrl));
+
 
             return response()->json(['success' => 'Customer status updated successfully!'], 200);
         } catch (\Exception $e) {
             // Return error response
-            return response()->json(['error' => 'Failed to update customer status'], 500);
+            return response()->json(['error' => 'Failed to update customer status',$e->getMessage()], 500);
         }
     }
     public function Customertokens(Request $request, $userId)
