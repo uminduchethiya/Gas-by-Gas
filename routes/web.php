@@ -67,11 +67,17 @@ Route::middleware(['auth:web'])->group(function () {
 
 
 
-            Route::get('/DeliveryPlan', action: [DeliveryPlanController::class, 'index'])->name('DeliveryPlan.index');
+            Route::get('/DeliveryPlan', action: [DeliveryPlanController::class, 'index'])->name(name: 'DeliveryPlan.index');
             Route::get('/DeliveryPlan/{id}', action: [DeliveryPlanController::class, 'show'])->name('DeliveryPlan.show');
             Route::post('/DeliveryPlan', action: [DeliveryPlanController::class, 'store'])->name(name: 'DeliveryPlan.store');
             Route::put('/DeliveryPlan/{id}', action: [DeliveryPlanController::class, 'update'])->name(name: 'DeliveryPlan.update');
             Route::delete('/DeliveryPlan/{deliveryPlanID}', [DeliveryPlanController::class, 'destroy'])->name('DeliveryPlan.destroy');
+
+            Route::get('/Stock', action: [StockController::class, 'adminIndex'])->name('stock.adminIndex');
+            Route::get('/Token', action: [TokenController::class, 'adminIndex'])->name('Token.adminIndex');
+
+            Route::get('/tokenHistoryList/{id}', [CustomerController::class, 'TokenHistory'])->name('tokenHistoryList');
+
         });
 
     // Manager Dashboard route
@@ -91,7 +97,6 @@ Route::middleware(['auth:web'])->group(function () {
             Route::delete('/customer/{id}', [CustomerController::class, 'destroy'])->name('customer.destroy');
 
             Route::get('/tokenHistory/{id}', [CustomerController::class, 'Customertokens'])->name('tokenHistory');
-            Route::get('/tokenHistoryList/{id}', [CustomerController::class, 'TokenHistory'])->name('tokenHistoryList');
 
            
 

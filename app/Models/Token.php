@@ -38,8 +38,8 @@ class Token extends Model
     }
 
     // Define the relationship with the Branch model
-    public function branch()
+    public function outlet()
     {
-        return $this->belongsTo(Branch::class);
+        return $this->belongsTo(outlet::class);
     }
 }

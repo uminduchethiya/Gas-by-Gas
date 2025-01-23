@@ -288,9 +288,6 @@
     }
 
 
-
-
-
     $(document).ready(function () {
         // Handle form submission via AJAX
         $('#saveButton').click(function (e) {
