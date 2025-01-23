@@ -82,6 +82,9 @@
                             @endif
                         </a>
                     </th>
+                    <th class="px-4 py-2">
+                        Quantity
+                    </th>
                     <th class="px-4 py-2">Actions</th>
                 </tr>
             </thead>
@@ -108,6 +111,8 @@
                                     <td class="px-4 py-2">{{ $token->gas_cylinder_name ?? 'N/A' }}</td>
                                     <td class="px-4 py-2">{{ $token->user_name }}</td>
                                     <td class="px-4 py-2">{{ $token->expires_at }}</td>
+                                    <td class="px-4 py-2">{{ $token->quantity }}</td>
+
                                     <td class="px-4 py-2">
                                         <!-- Disable button if status is 'complete' or 'canceled' -->
                                         <button onclick="openModal({{ $token }})"

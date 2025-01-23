@@ -18,9 +18,9 @@ class Stock extends Model
     ];
 
     // Define relationship with Branch
-    public function branch()
+    public function outlet()
     {
-        return $this->belongsTo(Branch::class);
+        return $this->belongsTo(Outlet::class);
     }
 
     // Define relationship with GasCylinder

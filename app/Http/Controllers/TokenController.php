@@ -41,6 +41,7 @@ class TokenController extends Controller
             'tokens.isActive',
             'tokens.description',
             'tokens.expires_at',
+            'tokens.quantity',
             'gas_cylinders.name as gas_cylinder_name',
             'users.name as user_name',
             'users.id as user_id',
@@ -53,7 +54,9 @@ class TokenController extends Controller
                 return $query->where(function ($query) use ($search) {
                     $query->where('tokens.status', 'like', '%' . $search . '%')
                         ->orWhere('users.name', 'like', '%' . $search . '%')
-                        ->orWhere('gas_cylinders.name', 'like', '%' . $search . '%');
+                        ->orWhere('gas_cylinders.name', 'like', '%' . $search . '%')
+                        ->orWhere('tokens.token_code', 'like', '%' . $search . '%');
+
                 });
             })
             ->when($status, function ($query, $status) {
@@ -84,6 +87,32 @@ class TokenController extends Controller
             "loggedInUserOutletId" => $loggedInUserOutletId
         ]);
     }
+    public function adminIndex(Request $request)
+    {
+        $tokens = Token::query();
+
+        if ($request->has('outlet_id') && !empty($request->outlet_id)) {
+            $tokens->where('outlet_id', $request->outlet_id);
+        }
+
+        if ($request->has('cylinder_type_id') && !empty($request->cylinder_type_id)) {
+            $tokens->where('cylinder_type_id', $request->cylinder_type_id);
+        }
+
+        if ($request->has('status') && !empty($request->status)) {
+            $tokens->where('status', $request->status);
+        }
+
+        if ($request->has('search') && !empty($request->search)) {
+            $tokens->where('token_code', 'like', '%' . $request->search . '%');
+        }
+
+        $outlets = Outlet::all();
+        $gasCylinders = GasCylinder::all();
+        $tokens = $tokens->with('outlet', 'gasCylinder','user')->paginate(10);
+
+        return view('admin.token.index', compact('tokens', 'outlets', 'gasCylinders'));
+    }
 
     public function update(Request $request, $id, TwilioSmsService $smsService)
     {
@@ -110,7 +139,6 @@ class TokenController extends Controller
                     ->first();
 
                 if ($currentStock) {
-
                     $currentStock->quantity -= $token->quantity;
                     $currentStock->save();
                 } else {
