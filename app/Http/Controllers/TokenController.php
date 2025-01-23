@@ -177,6 +177,15 @@ class TokenController extends Controller
     // duplicated logic used for differnt perpose retun types diffent if u do any changes to on please apply to other 
     public function issueToken(Request $request, TwilioSmsService $smsService)
     {
+        $userId = $request->input('user_id');
+
+        // Fetch the user role to validate the cylinder quantity conditionally
+        $user = User::find($userId);
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'The specified user does not exist.');
+        }
+
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
@@ -188,14 +197,31 @@ class TokenController extends Controller
 
 
         // If validation fails, return the error messages
+
+            // Conditional validation for cylinder_quantity based on user role
+            'cylinder_quantity' => [
+                function ($attribute, $value, $fail) use ($user) {
+                    if ($user->role_id == 4 && (empty($value) || $value < 1)) {
+                        $fail('Cylinder quantity is required and must be at least 1 for this role.');
+                    }
+
+                    if ($user->role_id == 3 && !empty($value)) {
+                        $fail('Cylinder quantity is not allowed for this role.');
+                    }
+                },
+            ],
+        ]);
+
+        // If validation fails, return error messages
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $userId = $request->input('user_id');
         $outletId = $request->input('outlet_id');
         $cylinderTypeId = $request->input('cylinder_type_id');
-        $quantity = $request->input('cylinder_quantity');
+
+        $quantity = $request->input('cylinder_quantity'); // Default to 0 if not provided
         DB::beginTransaction();
 
         try {
@@ -218,12 +244,14 @@ class TokenController extends Controller
                 return redirect()->back()->with('error', 'The selected branch does not have tokens for this cylinder type.');
             }
 
-            if ($branchToken->currentTokens < $quantity) {
+            if ($user->role_id == 4 && $branchToken->currentTokens < $quantity) {
                 DB::rollBack();
                 return redirect()->back()->with('error', 'No tokens are available for this cylinder type at the selected branch.');
             }
 
-            $branchToken->decrement('currentTokens', $quantity);
+            if ($user->role_id == 4) {
+                $branchToken->decrement('currentTokens', $quantity);
+            }
 
             $tokenCode = Str::uuid()->toString();
             $expiresAt = now()->addDays(14);
@@ -239,6 +267,7 @@ class TokenController extends Controller
                 'isActive' => 1,
                 'description' => 'Token issued',
                 'quantity' => $quantity,
+
                 'expires_at' => $expiresAt,
                 'token_code' => $tokenCode,
                 'created_by' => $createdBy,
@@ -252,7 +281,8 @@ class TokenController extends Controller
                 'reason' => null,
                 'updated_by' => Auth::id(),
             ]);
-            $tokenUser = User::find($userId);
+
+            $tokenUser = $user;
             $message = "Your token has been created with a quantity of $quantity. Thank you!";
 
             $countryCode = '+94';
@@ -268,8 +298,11 @@ class TokenController extends Controller
             );
 
 
+            if (!$smsResponse['success']) {
+                throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
+            }
 
-            dd("check");
+
             DB::commit();
 
             return redirect()->back()->with('success', 'Token issued successfully.');
@@ -284,10 +317,10 @@ class TokenController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            // Return the error message
             return redirect()->back()->with('error', 'An error occurred while issuing the token. Please try again later.');
         }
     }
+
     // duplicated logic used for differnt perpose retun types diffent if u do any changes to on please apply to other 
     public function issueTokenAPI(Request $request, TwilioSmsService $smsService)
     {
@@ -397,6 +430,7 @@ class TokenController extends Controller
             ], 500);
         }
     }
+
     public function getTokenHistoryByID($id)
     {
         try {
