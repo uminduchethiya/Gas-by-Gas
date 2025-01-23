@@ -40,9 +40,7 @@ Route::get('/aboutus', [UserController::class, 'aboutus_view'])->name('aboutus')
 Route::get('/contactus', [UserController::class, 'countacus_view'])->name('contactus');
 Route::get('/token-view', [TokenController::class, 'tokenView'])->name('tokenview');
 // Route group for USER role
-Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function () {
-
-});
+Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function () {});
 
 Route::middleware(['auth:web'])->group(function () {
 
@@ -74,9 +72,6 @@ Route::middleware(['auth:web'])->group(function () {
             Route::post('/DeliveryPlan', action: [DeliveryPlanController::class, 'store'])->name(name: 'DeliveryPlan.store');
             Route::put('/DeliveryPlan/{id}', action: [DeliveryPlanController::class, 'update'])->name(name: 'DeliveryPlan.update');
             Route::delete('/DeliveryPlan/{deliveryPlanID}', [DeliveryPlanController::class, 'destroy'])->name('DeliveryPlan.destroy');
-
-
-
         });
 
     // Manager Dashboard route
@@ -98,7 +93,7 @@ Route::middleware(['auth:web'])->group(function () {
             Route::get('/tokenHistory/{id}', [CustomerController::class, 'Customertokens'])->name('tokenHistory');
             Route::get('/tokenHistoryList/{id}', [CustomerController::class, 'TokenHistory'])->name('tokenHistoryList');
 
-
+           
 
 
             Route::get('/CoparateCustomers', [CustomerController::class, 'Coparateindex'])->name('CoparateCustomers.Coparateindex');
@@ -106,7 +101,5 @@ Route::middleware(['auth:web'])->group(function () {
 
 
             Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
-
-
         });
 });

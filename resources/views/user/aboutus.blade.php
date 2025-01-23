@@ -1,8 +1,21 @@
 @extends('layout.layout')
 
 @section('content')
+    <div style="background-image: url('{{ asset('images/aboutus.jpg') }}');"
+        class="bg-cover  w-full md:h-[550px] h-[250px] flex items-center justify-start">
+        <div class="container">
+            <h1 class="text-3xl font-bold text-white md:text-5xl font-boogaloo">About Us</h1>
+            <div class="flex flex-col md:mt-3 md:flex-row text-start">
+                <h1 class="flex flex-row items-center text-xl font-bold max-w-full px-4 text-white md:text-3xl">
+                    <a href="{{ route('home') }}">Home</a>
+                    <span class="md:mt-0"><img src="{{ asset('Images/lucide_move-left.png') }}" alt="Arrow"></span>
+                    About Us
+                </h1>
+            </div>
+        </div>
+    </div>
     <div>
-        <section class="flex-1 p-6 md:p-10 order-2 md:order-1">
+        <section class="flex-1 p-6 md:p-10 order-2 md:order-1 font-boogaloo">
             <em class="text-text-light text-2xl  font-bold uppercase tracking-wide block mb-4">About Us</em>
             <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-6 leading-tight">
                 We Help You <span class="text-text-dark">Keep Your Place Clean</span>

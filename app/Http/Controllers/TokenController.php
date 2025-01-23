@@ -83,7 +83,6 @@ class TokenController extends Controller
             'gasCylinders' => $gasCylinders,
             "loggedInUserOutletId" => $loggedInUserOutletId
         ]);
-
     }
 
     public function update(Request $request, $id, TwilioSmsService $smsService)
@@ -119,7 +118,7 @@ class TokenController extends Controller
                 }
             }
             if ($request->status === Token::STATUS_CANCELED) {
-               
+
 
                 $stock = OutletToken::where('outlet_id', $token->outlet_id)
                     ->where('cylinder_type_id', $token->cylinder_type_id)
@@ -181,16 +180,18 @@ class TokenController extends Controller
             'user_id' => 'required|exists:users,id',
             'outlet_id' => 'required|exists:outlets,id',
             'cylinder_type_id' => 'required|exists:gas_cylinders,id',
+            'cylinder_quantity' => 'nullable|integer|min:1', // Allow cylinder quantity only for organizators
         ]);
 
         // If validation fails, return the error messages
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         $userId = $request->input('user_id');
         $outletId = $request->input('outlet_id');
         $cylinderTypeId = $request->input('cylinder_type_id');
+        $quantity=$request->input('cylinder_quantity');
         DB::beginTransaction();
 
         try {
@@ -200,7 +201,7 @@ class TokenController extends Controller
 
             if ($activeTokensCount >= 2) {
                 DB::rollBack();
-                return response()->json(['error' => 'You cannot have more than 2 active tokens.'], 400);
+                return redirect()->back()->with('error', 'You cannot have more than 2 active tokens.');
             }
 
             $branchToken = OutletToken::where('outlet_id', $outletId)
@@ -209,15 +210,15 @@ class TokenController extends Controller
 
             if (!$branchToken) {
                 DB::rollBack();
-                return response()->json(['error' => 'The selected branch does not have tokens for this cylinder type.'], 400);
+                return redirect()->back()->with('error', 'The selected branch does not have tokens for this cylinder type.');
             }
 
-            if ($branchToken->currentTokens == 0) {
+            if ($branchToken->currentTokens < $quantity) {
                 DB::rollBack();
-                return response()->json(['error' => 'No tokens are available for this cylinder type at the selected branch.'], 400);
+                return redirect()->back()->with('error', 'No tokens are available for this cylinder type at the selected branch.');
             }
 
-            $branchToken->decrement(column: 'currentTokens');
+            $branchToken->decrement('currentTokens', $quantity);
 
             $tokenCode = Str::uuid()->toString();
             $expiresAt = now()->addDays(14);
@@ -232,7 +233,7 @@ class TokenController extends Controller
                 'status' => Token::STATUS_PENDING,
                 'isActive' => 1,
                 'description' => 'Token issued',
-                'quantity' => 1,
+                'quantity' => $quantity ,
                 'expires_at' => $expiresAt,
                 'token_code' => $tokenCode,
                 'created_by' => $createdBy,
@@ -247,7 +248,7 @@ class TokenController extends Controller
                 'updated_by' => Auth::id(),
             ]);
             $tokenUser = User::find($userId);
-            $message = "Your token  has been: Created. Thank you!";
+            $message = "Your token has been created with a quantity of $quantity. Thank you!";
 
             $countryCode = '+94';
             $userContactNumber = $tokenUser->contact_number;
@@ -265,7 +266,7 @@ class TokenController extends Controller
             }
             DB::commit();
 
-            return response()->json(['success' => 'Token issued successfully.', 'token' => $token], 200);
+            return redirect()->back()->with('success', 'Token issued successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -277,7 +278,7 @@ class TokenController extends Controller
             ]);
 
             // Return the error message
-            return response()->json(['error' => 'An error occurred while issuing the token. Please try again later.', $e->getMessage()], 500);
+            return redirect()->back()->with('error', 'An error occurred while issuing the token. Please try again later.');
         }
     }
     public function getTokenHistoryByID($id)
@@ -295,7 +296,6 @@ class TokenController extends Controller
                 'success' => true,
                 'history' => $history
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
@@ -304,15 +304,17 @@ class TokenController extends Controller
     public function tokenView()
     {
         $outlets = Outlet::all();
+        $user = auth()->user();
 
         $gasCylinders = GasCylinder::where('isActive', true)->get();
 
         $loggedInUserId = auth()->id();
 
         $assignedOutletId = auth()->user()->outlet_id;
-
-        return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId'));
+        $assignedStatus = auth()->user()->role_id;
+        return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId', 'assignedStatus'));
     }
+    
     public function assignNewUserToToken(Request $request, TwilioSmsService $smsService)
     {
         $request->validate([
@@ -382,5 +384,4 @@ class TokenController extends Controller
             ], 500);
         }
     }
-
 }
