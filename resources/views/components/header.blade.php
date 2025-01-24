@@ -43,10 +43,9 @@
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Edit
                                 Profile</a>
             
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                                @csrf
-                                @method('DELETE')
-                            </form>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                                    @csrf
+                                </form>
                             <button type="button" onclick="logout()"
                                 class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Logout</button>
                         @endauth
@@ -118,9 +117,15 @@
     }
 
     function logout() {
-        // Show a confirmation message before logging out
-        if (confirm("Are you sure you want to log out?")) {
-            document.getElementById('logout-form').submit();
-        }
-    }
+    // Optional: Clear any user data stored in localStorage or sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // Submit the logout form
+    document.getElementById('logout-form').submit();
+
+    // Redirect to the login page after form submission
+    window.location.href = "/login-view";
+}
+
 </script>
