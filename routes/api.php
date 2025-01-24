@@ -43,4 +43,7 @@ Route::post('/assign-newUser', [TokenController::class, 'assignNewUserToToken'])
 
 
 
-Route::delete('/logout', function () {auth()->logout(); return redirect()->route('login'); })->name('logout');
+Route::post('/logout', function () {
+    auth()->logout();
+    return redirect()->route('login');
+})->name('logout');
