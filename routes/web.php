@@ -16,6 +16,8 @@ use App\Http\Controllers\StockController;
 
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GasCylinderController;
+
 
 
 /*
@@ -77,6 +79,9 @@ Route::middleware(['auth:web'])->group(function () {
             Route::get('/Token', action: [TokenController::class, 'adminIndex'])->name('Token.adminIndex');
 
             Route::get('/tokenHistoryList/{id}', [CustomerController::class, 'TokenHistory'])->name('tokenHistoryList');
+
+            Route::apiResource('gas-cylinders', GasCylinderController::class);
+
 
         });
 
