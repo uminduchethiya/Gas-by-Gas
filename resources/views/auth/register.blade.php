@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAS BY GAS USER REGISTER</title>
     @vite('resources/css/app.css')
+    <!-- Include SweetAlert2 CSS and JS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Background Gradient Animation */
         body {
@@ -49,8 +52,25 @@
         }
     </style>
 </head>
-
+@if (session('status') == 'error')
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: "{{ session('message') }}",
+        });
+    </script>
+@elseif (session('status') == 'success')
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: "{{ session('message') }}",
+        });
+    </script>
+@endif
 <body class="flex items-center justify-center min-h-screen bg-main-bg font-mono">
+    
     <!-- Login Container -->
     <div
         class="w-full max-w-md p-8 space-y-6 bg-secondary-bg rounded-lg shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105">
@@ -99,10 +119,11 @@
 
             <!-- NIC-->
             <div>
-                <label for="nic" class="block text-sm font-medium text-text-secondary">Nic</label>
+                <label for="nic" class="block text-sm font-medium text-text-secondary">NIC</label>
                 <input type="text" id="nic" name="nic" required
                     class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg"
-                    placeholder="Enter your nic">
+                    placeholder="Enter 12-digit NIC or 9-digit NIC ending with V/X">
+                <small class="text-sm text-gray-400">Old NIC: 123456789V | New NIC: 123456789012</small>
             </div>
 
             <!-- Address Input -->
@@ -118,7 +139,8 @@
                 <label for="contact-number" class="block text-sm font-medium text-text-secondary">Contact Number</label>
                 <input type="tel" id="contact-number" name="contact_number" required
                     class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg"
-                    placeholder="Enter your contact number">
+                    placeholder="+94XXXXXXXXX">
+                <small class="text-sm text-gray-400">Enter the phone number in the format +94XXXXXXXXX.</small>
             </div>
 
             <!-- Branch Input -->
@@ -166,6 +188,35 @@
                     fileContainer.classList.toggle('hidden', !checkbox.checked);
                 }
             </script>
+           <script>
+            document.querySelector('.animated-form').addEventListener('submit', function (e) {
+                const nic = document.getElementById('nic').value.trim();
+                const contactNumber = document.getElementById('contact-number').value.trim();
+        
+                const nicRegex = /^\d{12}$|^\d{9}[vVxX]$/; // NIC validation
+                const phoneRegex = /^\+94\d{9}$/; // Phone number validation
+        
+                if (!nicRegex.test(nic)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid NIC Format',
+                        text: 'Please enter a valid NIC. Use 12 digits for the new NIC or 9 digits followed by V/v or X/x for the old NIC.',
+                    });
+                    return;
+                }
+        
+                if (!phoneRegex.test(contactNumber)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Phone Number Format',
+                        text: 'Please enter a valid phone number. It should start with +94 followed by 9 digits.',
+                    });
+                    return;
+                }
+            });
+        </script>
         </form>
         <!-- Forgot Password Link -->
         <div class="text-center">
