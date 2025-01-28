@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\TokenController;
 use App\Http\Controllers\SMSController;
 
@@ -41,7 +42,7 @@ Route::post('/send-sms', [SMSController::class, 'sendSMS']);
 Route::post('/assign-newUser', [TokenController::class, 'assignNewUserToToken']);
 
 
-
+Route::post('/contact', [EmailController::class, 'submitForm'])->name('contact.submit');
 
 Route::post('/logout', function () {
     auth()->logout();
