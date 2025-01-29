@@ -2,33 +2,40 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
+use App\Models\UserRole;
+use App\Models\Outlet;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use App\Consts\UserRoleConst;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
-
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+   
     public function definition(): array
     {
+        $role = UserRole::create(['id' => UserRoleConst::USER, 'name' => 'User']);
+        $outlet = Outlet::factory()->create();
+
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'password' => Hash::make('password'), 
+            'address' => $this->faker->address(),
+            'nic' => $this->faker->unique()->numerify('#########V'), // NIC Format
+            'contact_number' => $this->faker->phoneNumber(),
+            'role_id' => $role->id,
+            'outlet_id' => $outlet->id, // Set a valid outlet
+            'isActive' => true,
+            'is_organization' => false, 
+            'verification_file' => null, 
+            'status' => 'active', // Or any valid status you're using
         ];
     }
 
@@ -39,6 +46,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an organization user.
+     */
+    public function asOrganization(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_organization' => true,
         ]);
     }
 }

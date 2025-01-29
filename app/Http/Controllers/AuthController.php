@@ -160,14 +160,12 @@ class AuthController extends Controller
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
-
             $isOrganization = filter_var($request->is_organization, FILTER_VALIDATE_BOOLEAN);
 
             $verificationFilePath = null;
             if ($isOrganization && $request->hasFile('verification_file')) {
                 $verificationFilePath = $request->file('verification_file')->store('verification_files', 'public');
             }
-
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -183,8 +181,6 @@ class AuthController extends Controller
             ]);
 
             return response()->json(['success' => 'Customer created successfully!']);
-        } catch (\Exception $e) {
-            // Handle any exceptions
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
