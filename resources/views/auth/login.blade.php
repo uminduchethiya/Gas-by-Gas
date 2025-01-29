@@ -105,7 +105,7 @@
 
         <!-- Forgot Password Link -->
         <div class="text-center">
-            <a href="#" class="text-sm text-accent-1 hover:underline">Forgot your password?</a>
+            <a href="/forgot-password" class="text-sm text-accent-1 hover:underline">Forgot your password?</a>
         </div>
         <div class="text-center">
             <a href="/register-view" class="text-sm text-accent-1 hover:underline">Register</a>
