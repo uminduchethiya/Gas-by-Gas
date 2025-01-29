@@ -84,20 +84,26 @@ class AuthController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8|confirmed',
-                'contact_number' => 'nullable|string',
+                'contact_number' => [
+                    'required',
+                    'regex:/^\+94\d{9}$/', // Must start with +94 followed by 9 digits
+                ],
                 'address' => 'nullable|string',
-                'nic' => 'nullable|string',
+                'nic' => [
+                    'required',
+                    'regex:/^\d{12}$|^\d{9}[vVxX]$/', // New NIC (12 digits) or Old NIC (9 digits followed by V/v or X/x)
+                ],
                 'outlet' => 'required|exists:outlets,id',
                 'is_organization' => 'sometimes|boolean',
                 'verification_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048|required_if:is_organization,true',
             ]);
 
             if ($validator->fails()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
+                return redirect()->back()
+                    ->with('status', 'error')
+                    ->with('message', $validator->errors()->first());
             }
+
 
             // Convert is_organization to a boolean
             $isOrganization = filter_var($request->is_organization, FILTER_VALIDATE_BOOLEAN);
@@ -123,17 +129,18 @@ class AuthController extends Controller
                 'status' => $isOrganization ? 'deactive' : 'active', // Set status to 'deactive' for organizations
             ]);
 
-            // Return success response
-            return redirect()->route('login')->with('status', 'Registration successful! Please log in.');
+
+            return redirect()->route('login')
+                ->with('status', 'success')
+                ->with('message', 'User registered successfully!');
         } catch (\Exception $e) {
             // Handle any exceptions
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred during registration. Please try again.',
-                'error' => $e->getMessage(),
-            ], 500);
+            return redirect()->back()
+                ->with('status', 'error')
+                ->with('message', 'An error occurred during registration. Please try again.');
         }
     }
+
 
     public function registerByAdmin(Request $request)
     {
@@ -183,7 +190,6 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
-
     }
     public function updateCustomer(Request $request)
     {
@@ -227,5 +233,4 @@ class AuthController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 }

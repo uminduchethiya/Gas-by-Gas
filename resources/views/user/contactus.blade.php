@@ -98,7 +98,8 @@
             <!-- Contact Form Section -->
             <section class="bg-white p-8 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold mb-6 text-[#1F1C58]">Send Us a Message</h2>
-                <form action="#" method="POST" class="space-y-6">
+                <form action="{{ route('contact.submit') }}" method="POST" class="space-y-6">
+                    @csrf
                     <!-- Name Field -->
                     <div>
                         <label for="name" class="block text-[#1F1C58] font-semibold mb-1">Your Name</label>

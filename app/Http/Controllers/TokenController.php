@@ -56,7 +56,6 @@ class TokenController extends Controller
                         ->orWhere('users.name', 'like', '%' . $search . '%')
                         ->orWhere('gas_cylinders.name', 'like', '%' . $search . '%')
                         ->orWhere('tokens.token_code', 'like', '%' . $search . '%');
-
                 });
             })
             ->when($status, function ($query, $status) {
@@ -109,7 +108,7 @@ class TokenController extends Controller
 
         $outlets = Outlet::all();
         $gasCylinders = GasCylinder::all();
-        $tokens = $tokens->with('outlet', 'gasCylinder','user')->paginate(10);
+        $tokens = $tokens->with('outlet', 'gasCylinder', 'user')->paginate(10);
 
         return view('admin.token.index', compact('tokens', 'outlets', 'gasCylinders'));
     }
@@ -214,7 +213,6 @@ class TokenController extends Controller
             return redirect()->back()->with('error', 'The specified user does not exist.');
         }
 
-
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'outlet_id' => 'required|exists:outlets,id',
@@ -225,26 +223,25 @@ class TokenController extends Controller
                         $fail('Cylinder quantity is required and must be at least 1 for this role.');
                     }
 
-                    if ($user->role_id == 3 && !empty($value)) {
-                        $fail('Cylinder quantity is not allowed for this role.');
+                    if ($user->role_id == 3 && (!empty($value) && $value != 1)) {
+                        $fail('Only 1 cylinder can be issued for this role.');
                     }
                 },
             ],
         ]);
-        // If validation fails, return error messages
 
+        // If validation fails, return error messages
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
         $outletId = $request->input('outlet_id');
         $cylinderTypeId = $request->input('cylinder_type_id');
+        $quantity = $request->input('cylinder_quantity', 1); // Default to 1 if not provided
 
-        $quantity = $request->input('cylinder_quantity'); // Default to 0 if not provided
         DB::beginTransaction();
 
         try {
-
             $activeTokensCount = Token::where('user_id', $userId)
                 ->whereIn('status', [Token::STATUS_PENDING, Token::STATUS_SCHEDULED])
                 ->count();
@@ -263,6 +260,7 @@ class TokenController extends Controller
                 return redirect()->back()->with('error', 'The selected branch does not have tokens for this cylinder type.');
             }
 
+            // Handle role-specific token decrement
             if ($user->role_id == 4 && $branchToken->currentTokens < $quantity) {
                 DB::rollBack();
                 return redirect()->back()->with('error', 'No tokens are available for this cylinder type at the selected branch.');
@@ -270,6 +268,8 @@ class TokenController extends Controller
 
             if ($user->role_id == 4) {
                 $branchToken->decrement('currentTokens', $quantity);
+            } elseif ($user->role_id == 3) {
+                $branchToken->decrement('currentTokens', 1); // Always decrement by 1 for role 3
             }
 
             $tokenCode = Str::uuid()->toString();
@@ -286,7 +286,6 @@ class TokenController extends Controller
                 'isActive' => 1,
                 'description' => 'Token issued',
                 'quantity' => $quantity,
-
                 'expires_at' => $expiresAt,
                 'token_code' => $tokenCode,
                 'created_by' => $createdBy,
@@ -316,17 +315,14 @@ class TokenController extends Controller
                 $message
             );
 
-
             if (!$smsResponse['success']) {
                 throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
             }
-
 
             DB::commit();
 
             return redirect()->back()->with('success', 'Token issued successfully.');
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
 
             Log::error('Token issue failed', [
@@ -339,6 +335,7 @@ class TokenController extends Controller
             return redirect()->back()->with('error', 'An error occurred while issuing the token. Please try again later.');
         }
     }
+
 
     // duplicated logic used for differnt perpose retun types diffent if u do any changes to on please apply to other 
     public function issueTokenAPI(Request $request, TwilioSmsService $smsService)
@@ -432,9 +429,6 @@ class TokenController extends Controller
                 $userContactNumber,
                 $message
             );
-
-
-
             DB::commit();
             return response()->json([
                 'success' => true,
