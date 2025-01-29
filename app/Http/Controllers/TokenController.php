@@ -472,10 +472,10 @@ class TokenController extends Controller
         $gasCylinders = GasCylinder::where('isActive', true)->get();
 
         $loggedInUserId = auth()->id();
-
+        $loggedInUserRole = auth()->user()->role_id ?? null;
         $assignedOutletId = auth()->user()->outlet_id;
         $assignedStatus = auth()->user()->role_id;
-        return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId', 'assignedStatus'));
+        return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId', 'assignedStatus','loggedInUserRole'));
     }
 
     public function assignNewUserToToken(Request $request, TwilioSmsService $smsService)
