@@ -14,6 +14,7 @@ use App\Consts\UserRoleConst;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OutletCreated;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class OutletController extends Controller
 {
@@ -39,7 +40,14 @@ class OutletController extends Controller
             'outlets.isActive',
             'branches.name as branch_name',
             'branches.id as branch_id',
+            'users.name as user_name',
+            'users.address as manageraddress',
+            'users.nic as managernic',
+            'users.contact_number as managercontact_number',
+
             'users.name as user_name'
+
+
         )
             ->leftJoin('branches', 'outlets.branch_id', '=', 'branches.id')
             ->leftJoin('users', 'outlets.user_id', '=', 'users.id')
@@ -75,59 +83,65 @@ class OutletController extends Controller
     public function store(Request $request)
     {
         try {
-            DB::beginTransaction(); // Start the transaction
+            DB::beginTransaction(); // Start transaction
 
-            $validated = $request->validate([
+            $validated =  Validator::make($request->all(), [
                 'branch_id' => 'required|exists:branches,id',
                 'Name' => 'required|string|max:255',
                 'Address' => 'required|string',
                 'ContactNumber' => 'required|string|max:15',
+                'ManagerName' => 'required|string|max:255',
+                'ManagerAddress' => 'required|string',
+                'nic' => [
+                    'required',
+                    'regex:/^\d{12}$|^\d{9}[vVxX]$/', // New NIC (12 digits) or Old NIC (9 digits followed by V/v or X/x)
+                ],
+                'ManagerContactNumber' => 'required|string|max:15',
                 'Email' => 'nullable|email|unique:users,email',
                 'isActive' => 'required',
             ]);
-            $loginUrl = url('/login-view'); // URL to the login page
-            $isActive = ($validated['isActive'] === 'Active') ? 1 : 0;
+
+            if ($validated->fails()) {
+                return response()->json(['errors' => $validated->errors()], 422);
+            }
+            $isActive = ($request->isActive === 'Active') ? 1 : 0;
 
             $outlet = Outlet::create([
-                'name' => $validated['Name'],
-                'address' => $validated['Address'],
-                'ContactNumber' => $validated['ContactNumber'],
+                'name' => $request->Name,
+                'address' => $request->Address,
+                'ContactNumber' => $request->ContactNumber,
                 'email' => $request->Email,
                 'isActive' => $isActive,
-                'branch_id' => $validated['branch_id'],
+                'branch_id' => $request->branch_id,
                 'UserID' => null,
             ]);
 
-
             $user = null;
-            if ($validated['Email']) {
+            if ($request->Email) {
                 $user = User::create([
-                    'name' => $request->Name,
+                    'name' => $request->ManagerName,
                     'email' => $request->Email,
                     'password' => bcrypt(config('app.USER_DEFAULT_PASSWORD')),
-                    'contact_number' => $request->ContactNumber,
-                    'address' => $request->Address,
+                    'contact_number' => $request->ManagerContactNumber,
+                    'address' => $request->ManagerAddress,
+                    'nic' => $request->nic,
                     'role_id' => UserRoleConst::MANAGER,
                     'outlet_id' => $outlet->id,
                 ]);
-                Mail::to($user->email)->send(new OutletCreated($user, $loginUrl));
+                Mail::to($user->email)->send(new OutletCreated($user, url('/login-view')));
             }
 
-            $outlet->update([
-                'UserID' => $user->id,
-            ]);
+            $outlet->update(['UserID' => $user->id]);
 
-            DB::commit(); // Commit the transaction
+            DB::commit();
             return response()->json(['success' => 'Outlet created successfully!']);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
     public function destroy(Outlet $outlet)
     {
         try {
@@ -163,7 +177,7 @@ class OutletController extends Controller
     {
         try {
             $outlet = Outlet::with(['outletTokens.gasCylinder'])  // Eager load outletTokens and their related gasCylinder
-            ->findOrFail($outletId);
+                ->findOrFail($outletId);
             $outletData = [
                 'Name' => $outlet->Name,
                 'Address' => $outlet->Address,

@@ -141,53 +141,82 @@
                     <div class="mb-4">
                         <label for="branch_id" class="block text-sm font-medium text-gray-700">Branch</label>
                         <select id="branch_id" name="branch_id" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             @foreach ($branches as $branch)
                                 <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <!-- Name -->
+                    <!-- Outlet Name -->
                     <div class="mb-4">
                         <label for="Name" class="block text-sm font-medium text-gray-700">Outlet Name</label>
                         <input type="text" id="Name" name="Name" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
 
-                    <!-- Address -->
+                    <!-- Outlet Address -->
                     <div class="mb-4">
-                        <label for="Address" class="block text-sm font-medium text-gray-700">Address</label>
+                        <label for="Address" class="block text-sm font-medium text-gray-700">Outlet Address</label>
                         <textarea id="Address" name="Address" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
                     </div>
 
-                    <!-- Contact Number -->
+                    <!-- Outlet Contact Number -->
                     <div class="mb-4">
-                        <label for="ContactNumber" class="block text-sm font-medium text-gray-700">Contact
+                        <label for="ContactNumber" class="block text-sm font-medium text-gray-700">Outlet Contact
                             Number</label>
                         <input type="text" id="ContactNumber" name="ContactNumber" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
 
-                    <!-- Email -->
+                    <!-- Manager Name -->
                     <div class="mb-4">
-                        <label for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <label for="ManagerName" class="block text-sm font-medium text-gray-700">Outlet Manager
+                            Name</label>
+                        <input type="text" id="ManagerName" name="ManagerName" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+
+                    <!-- Manager Address -->
+                    <div class="mb-4">
+                        <label for="ManagerAddress" class="block text-sm font-medium text-gray-700">Outlet Manager
+                            Address</label>
+                        <textarea id="ManagerAddress" name="ManagerAddress" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                    </div>
+
+                    <!-- Manager Contact Number -->
+                    <div class="mb-4">
+                        <label for="ManagerContactNumber" class="block text-sm font-medium text-gray-700">Outlet Manager
+                            Contact Number</label>
+                        <input type="text" id="ManagerContactNumber" name="ManagerContactNumber" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="nic" class="block text-sm font-medium text-gray-700">Outlet Manager nic</label>
+                        <input type="text" id="nic" name="nic"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <!-- Manager Email -->
+                    <div class="mb-4">
+                        <label for="Email" class="block text-sm font-medium text-gray-700">Outlet Manager Email</label>
                         <input type="email" id="Email" name="Email"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
 
                     <!-- Status -->
                     <div class="mb-4">
-                        <label for="Status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <label for="isActive" class="block text-sm font-medium text-gray-700">Status</label>
                         <select id="isActive" name="isActive" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>
                     </div>
 
-                    <!-- Submit Button -->
+                    <!-- Submit Buttons -->
                     <div class="flex justify-end">
                         <button id="saveButton" type="submit"
                             class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
@@ -199,6 +228,7 @@
                         </button>
                     </div>
                 </form>
+
             </div>
         </div>
         <!-- View Outlet Modal -->
@@ -266,26 +296,34 @@
         const modalTitle = document.getElementById('modalTitle');
         const form = document.getElementById('addEditOutletForm');
 
-        if (mode === 'edit') {
+        if (mode === 'edit' && outlet) {
             modalTitle.textContent = 'Edit Outlet';
             console.log(outlet);
+
             document.getElementById('outletId').value = outlet.id || '';
             document.getElementById('branch_id').value = outlet.branch_id || '';
             document.getElementById('Name').value = outlet.Name || '';
             document.getElementById('Address').value = outlet.Address || '';
             document.getElementById('ContactNumber').value = outlet.ContactNumber || '';
             document.getElementById('Email').value = outlet.Email || '';
-            let isActiveValue = outlet.isActive === 1 ? 'Active' : 'Inactive';
 
-            // Get the select element and set the value
-            document.getElementById('isActive').value = isActiveValue || '';
+            document.getElementById('ManagerName').value = outlet.user_name || '';
+            document.getElementById('ManagerAddress').value = outlet.manageraddress || '';
+            document.getElementById('ManagerContactNumber').value = outlet.managercontact_number || '';
+            document.getElementById('nic').value = outlet.managernic || '';
+
+
+            // Convert isActive to string for the select field
+            document.getElementById('isActive').value = outlet.isActive === 1 ? 'Active' : 'Inactive';
+
         } else {
             modalTitle.textContent = 'Add Outlet';
-            form.reset(); // Clear the form for new outlet
+            form.reset(); // Reset form fields for new entry
         }
 
         modal.classList.remove('hidden');
     }
+
 
 
     $(document).ready(function () {
