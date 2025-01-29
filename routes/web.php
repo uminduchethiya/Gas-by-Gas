@@ -39,6 +39,8 @@ Route::get('/home', [UserController::class, 'home_view'])->name('home');
 Route::get('/aboutus', [UserController::class, 'aboutus_view'])->name('aboutus');
 Route::get('/contactus', [UserController::class, 'countacus_view'])->name('contactus');
 Route::get('/token-view', [TokenController::class, 'tokenView'])->name('tokenview');
+Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
 // Route group for USER role
 Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function () {});
 

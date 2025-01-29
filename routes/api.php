@@ -35,6 +35,7 @@ Route::post('/issue-token-api', [TokenController::class, 'issueTokenAPI'])->name
 
 
 
+
 Route::get('/token-history/{id}', [TokenController::class, 'getTokenHistoryByID']);
 
 Route::post('/send-sms', [SMSController::class, 'sendSMS']);
@@ -48,3 +49,7 @@ Route::post('/logout', function () {
     auth()->logout();
     return redirect()->route('login');
 })->name('logout');
+
+
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
