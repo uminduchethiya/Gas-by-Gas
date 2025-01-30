@@ -19,7 +19,7 @@ class AuthControllerTest extends TestCase
 {
     use RefreshDatabase; // Ensure database is reset before each test
 
-    // /** @test */
+     /** @test */
     public function it_registers_a_user_successfully()
     {
         $branch = Branch::factory()->create();
@@ -47,7 +47,7 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'john@example.com']);
     }
 
-    // /** @test */
+     /** @test */
     public function it_fails_registration_due_to_validation_errors()
     {
         $response = $this->postJson(route('registerByAdmin.api'), [
@@ -61,7 +61,7 @@ class AuthControllerTest extends TestCase
     }
 
 
-    // /** @test */
+     /** @test */
 
     public function it_registers_an_organization_user_with_verification_file()
     {
@@ -101,7 +101,7 @@ class AuthControllerTest extends TestCase
         // Check that the file was uploaded correctly
         Storage::disk('public')->assertExists('verification_files/document.pdf');
     }
-    // /** @test */
+     /** @test */
 
     public function it_fails_to_register_a_user_with_duplicate_email()
     {
@@ -122,80 +122,41 @@ class AuthControllerTest extends TestCase
     }
 
 
-     /** @test */
-     public function it_updates_a_customer_successfully()
-     {
-         $outlet = Outlet::factory()->create();
-
-         $user = User::factory()->create([
-             'name' => 'Old Name',
-             'email' => 'old@example.com',
-         ]);
-
-         $response = $this->postJson(route('updateCustomer.api'), [
-             'id' => $user->id,
-             'name' => 'New Name',
-             'email' => 'new@example.com',
-             'outlet' => $outlet->id // Use the created outlet ID
-         ]);
-
-         $response->assertStatus(200)
-             ->assertJson(['success' => 'Customer updated successfully!']);
-
-         $this->assertDatabaseHas('users', ['id' => $user->id, 'name' => 'New Name']);
-     }
-
     // /** @test */
-     public function it_fails_update_due_to_validation_errors()
-     {
-         $user = User::factory()->create();
+    public function it_updates_a_customer_successfully()
+    {
+        $outlet = Outlet::factory()->create();
 
-         $response = $this->postJson(route('updateCustomer.api'), [
-             'id' => $user->id,
-             'name' => '',
-             'email' => 'invalid-email',
-         ]);
+        $user = User::factory()->create([
+            'name' => 'Old Name',
+            'email' => 'old@example.com',
+        ]);
+        $response = $this->postJson(route('updateCustomer.api'), [
+            'id' => $user->id,
+            'name' => 'New Name',
+            'email' => 'new@example.com',
+            'nic'=>$user->nic,
+            'outlet' => $outlet->id // Use the created outlet ID
+        ]);
+        $response->assertStatus(200)
+            ->assertJson(['success' => 'Customer updated successfully!']);
+
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'name' => 'New Name']);
+    }
+
+     /** @test */
+    public function it_fails_update_due_to_validation_errors()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->postJson(route('updateCustomer.api'), [
+            'id' => $user->id,
+            'name' => '',
+            'email' => 'invalid-email',
+        ]);
 
         $response->assertStatus(422)
-             ->assertJsonStructure(['errors']);
-     }
+            ->assertJsonStructure(['errors']);
+    }
 
-    // /** @test */
-    // public function it_fails_update_due_to_duplicate_email()
-    // {
-    //     User::factory()->create(['email' => 'existing@example.com']);
-    //     $user = User::factory()->create(['email' => 'unique@example.com']);
-
-    //     $response = $this->postJson(route('updateCustomer.api'), [
-    //         'id' => $user->id,
-    //         'name' => 'Test',
-    //         'email' => 'existing@example.com',
-    //     ]);
-
-    //     $response->assertStatus(422)
-    //         ->assertJsonStructure(['errors']);
-    // }
-
-    // /** @test */
-    // public function it_updates_a_user_with_new_password()
-    // {
-    //     $outlet = Outlet::factory()->create();
-
-    //     $user = User::factory()->create([
-    //         'password' => Hash::make('oldpassword'),
-    //     ]);
-
-    //     $response = $this->postJson(route('updateCustomer.api'), [
-    //         'id' => $user->id,
-    //         'name' => 'Updated Name',
-    //         'email' => $user->email,
-    //         'outlet' => $outlet->id,// Use the created outlet ID
-    //         'password' => 'newpassword123',
-    //     ]);
-
-    //     $response->assertStatus(200)
-    //         ->assertJson(['success' => 'Customer updated successfully!']);
-
-    //     $this->assertTrue(Hash::check('newpassword123', $user->fresh()->password));
-    // }
 }

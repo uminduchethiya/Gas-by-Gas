@@ -71,8 +71,6 @@ class DeliveryPlanController extends Controller
 
     public function store(Request $request)
     {
-
-
         try {
             DB::beginTransaction();
             $validatedData = $request->validate([
@@ -264,5 +262,7 @@ class DeliveryPlanController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+  
 
 }

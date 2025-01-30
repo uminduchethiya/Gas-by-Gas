@@ -98,8 +98,6 @@ Route::middleware(['auth:web'])->group(function () {
 
             Route::get('/tokenHistory/{id}', [CustomerController::class, 'Customertokens'])->name('tokenHistory');
 
-           
-
 
             Route::get('/CoparateCustomers', [CustomerController::class, 'Coparateindex'])->name('CoparateCustomers.Coparateindex');
             Route::get('/updateCopareateCustomerStatus/{id}', [CustomerController::class, 'updateCorporateCustomerStatus'])->name('CoparateCustomers.updateCopareateCustomerStatus');
