@@ -20,6 +20,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         $role = UserRole::create(['id' => UserRoleConst::USER, 'name' => 'User']);
+        
         $outlet = Outlet::factory()->create();
 
         return [
