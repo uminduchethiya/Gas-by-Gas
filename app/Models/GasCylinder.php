@@ -12,11 +12,11 @@ class GasCylinder extends Model
     protected $table = 'gas_cylinders';
 
     protected $fillable = [
-        'name', 
-        'description', 
-        'size', 
+        'name',
+        'description',
+        'size',
         'user_price',
-        
+
         'organization_price',
         'isActive'
     ];
@@ -24,5 +24,9 @@ class GasCylinder extends Model
     {
         return $this->hasMany(OutletToken::class, 'gas_cylinder_id');
     }
-   
+
+    public function tokens()
+    {
+        return $this->hasMany(Token::class, 'cylinder_type_id');
+    }
 }

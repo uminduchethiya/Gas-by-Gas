@@ -113,9 +113,25 @@
 
         <form id="form" method="POST" action="{{ route('api.issueToken') }}" class="bg-white p-8py-12 px-4 md:px-8">
             @csrf
-            <h1 class="text-2xl p-6 md:text-4xl font-bold text-gray-800 mb-6 leading-tight py-12 px-4 md:px-8">
-                Token <span class="text-text-dark">Request</span> <span class="text-gray-800">Form</span>
-            </h1>
+            <div class="flex">
+                <div class="W-1/2">
+                    <h1 class="text-2xl p-6 md:text-4xl font-bold text-gray-800 mb-6 leading-tight py-12 px-4 md:px-8">
+                        Token <span class="text-text-dark">Request</span> <span class="text-gray-800">Form</span>
+                    </h1>
+                </div>
+
+                <div class="w-1/2 flex items-center justify-center">
+                    <fieldset class="flex justify-center">
+                        <a href="{{ route('viewstatus') }}"
+                            class="w-auto px-3 flex items-center justify-center bg-yellow-500 text-white font-medium py-3 rounded-lg hover:bg-yellow-600 hover:shadow-lg transition">
+                            View Status
+                        </a>
+                    </fieldset>
+                </div>
+                
+
+            </div>
+
 
             <!-- Hidden input for the logged-in user's ID -->
             <input type="hidden" name="user_id" value="{{ $loggedInUserId }}">
@@ -138,13 +154,13 @@
 
             <!-- Cylinder Type Selection -->
             <fieldset class="mb-8 px-4 md:px-8">
-                <label for="cylinder_type" class="block text-sm font-medium text-gray-700 mb-2">Choose a Cylinder Type</label>
+                <label for="cylinder_type" class="block text-sm font-medium text-gray-700 mb-2">Choose a Cylinder
+                    Type</label>
                 <select name="cylinder_type_id" id="cylinder_type"
                     class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition">
                     <option value="" disabled selected>-- Select a Cylinder Type --</option>
                     @foreach ($gasCylinders as $cylinder)
-                        <option value="{{ $cylinder->id }}"
-                            data-user-price="{{ $cylinder->user_price }}"
+                        <option value="{{ $cylinder->id }}" data-user-price="{{ $cylinder->user_price }}"
                             data-organization-price="{{ $cylinder->organization_price }}">
                             {{ $cylinder->name }}
                         </option>
@@ -154,7 +170,8 @@
 
             <!-- Price Display Field -->
             <fieldset class="mb-8 px-4 md:px-8">
-                <label for="cylinder_price" class="block text-sm font-medium text-gray-700 mb-2">Per Cylinder Price (LKR)</label>
+                <label for="cylinder_price" class="block text-sm font-medium text-gray-700 mb-2">Per Cylinder Price
+                    (LKR)</label>
                 <input type="text" id="cylinder_price" name="cylinder_price" readonly
                     class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition">
             </fieldset>
@@ -209,14 +226,14 @@
             @endif
         </script>
         <script>
-            document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener("DOMContentLoaded", function() {
                 const cylinderTypeSelect = document.getElementById("cylinder_type");
                 const priceInput = document.getElementById("cylinder_price");
                 const userRole = document.getElementById("user_role").value;
-        
-                cylinderTypeSelect.addEventListener("change", function () {
+
+                cylinderTypeSelect.addEventListener("change", function() {
                     const selectedOption = cylinderTypeSelect.options[cylinderTypeSelect.selectedIndex];
-        
+
                     if (userRole == 3) {
                         priceInput.value = selectedOption.getAttribute("data-user-price") + " LKR";
                     } else if (userRole == 4) {
@@ -227,6 +244,6 @@
                 });
             });
         </script>
-        
+
     </section>
 @endsection

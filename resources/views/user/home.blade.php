@@ -88,13 +88,14 @@
                     <form id="form" method="POST" action="{{ route('api.issueToken') }}"
                         class="">
                         @csrf
-                        <h1 class="text-2xl  md:text-4xl font-bold text-gray-800  leading-tight   ">
-                            Token <span class="text-text-dark">Request</span> <span class="text-text-dark">Form</span>
+                        <h1 class="text-2xl md:text-4xl font-bold text-gray-800  leading-tight" >
+                            Token <span class="text-text-dark">Request</span> <span class="text-gray-800">Form</span>
                         </h1>
 
                         <!-- Hidden input for the logged-in user's ID -->
                         <input type="hidden" name="user_id" value="{{ $loggedInUserId }}">
                         <input type="hidden" name="token" value="{{ $assignedStatus }}">
+                        <input type="hidden" id="user_role" value="{{ $loggedInUserRole }}">
 
                         <!-- Outlet Selection -->
                         <fieldset class="mb-8  px-4 md:px-8">
@@ -113,17 +114,27 @@
                         </fieldset>
 
                         <!-- Cylinder Type Selection -->
-                        <fieldset class="mb-8 p px-4 md:px-8">
+                        <fieldset class="mb-8 px-4 md:px-8">
                             <label for="cylinder_type" class="block text-sm font-medium text-gray-700 mb-2">Choose a
-                                Cylinder
-                                Type</label>
+                                Cylinder Type</label>
                             <select name="cylinder_type_id" id="cylinder_type"
                                 class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition">
                                 <option value="" disabled selected>-- Select a Cylinder Type --</option>
                                 @foreach ($gasCylinders as $cylinder)
-                                    <option value="{{ $cylinder->id }}">{{ $cylinder->name }}</option>
+                                    <option value="{{ $cylinder->id }}" data-user-price="{{ $cylinder->user_price }}"
+                                        data-organization-price="{{ $cylinder->organization_price }}">
+                                        {{ $cylinder->name }}
+                                    </option>
                                 @endforeach
                             </select>
+                        </fieldset>
+
+                        <!-- Price Display Field -->
+                        <fieldset class="mb-8 px-4 md:px-8">
+                            <label for="cylinder_price" class="block text-sm font-medium text-gray-700 mb-2">Per Cylinder
+                                Price (LKR)</label>
+                            <input type="text" id="cylinder_price" name="cylinder_price" readonly
+                                class="w-full border border-gray-300 rounded-lg h-12 px-4 text-gray-800 bg-gray-50 focus:ring-2 focus:ring-yellow-500 focus:outline-none transition">
                         </fieldset>
 
                         <!-- Gas Cylinder Quantity Input (Conditionally Rendered) -->
@@ -146,7 +157,27 @@
                                 Submit Details
                             </button>
                         </fieldset>
+
                     </form>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const cylinderTypeSelect = document.getElementById("cylinder_type");
+                            const priceInput = document.getElementById("cylinder_price");
+                            const userRole = document.getElementById("user_role").value;
+
+                            cylinderTypeSelect.addEventListener("change", function() {
+                                const selectedOption = cylinderTypeSelect.options[cylinderTypeSelect.selectedIndex];
+
+                                if (userRole == 3) {
+                                    priceInput.value = selectedOption.getAttribute("data-user-price") + " LKR";
+                                } else if (userRole == 4) {
+                                    priceInput.value = selectedOption.getAttribute("data-organization-price") + " LKR";
+                                } else {
+                                    priceInput.value = "N/A";
+                                }
+                            });
+                        });
+                    </script>
                 </section>
             </div>
 
