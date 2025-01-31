@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('description');
             $table->decimal('size', 5, 2);
             $table->boolean('isActive')->default(true);
+            $table->decimal('user_price', 8, 2); // Normal user price in LKR
+            $table->decimal('organization_price', 8, 2); // Organization discounted price
             $table->timestamps();
         });
     }

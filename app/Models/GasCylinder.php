@@ -15,6 +15,9 @@ class GasCylinder extends Model
         'name', 
         'description', 
         'size', 
+        'user_price',
+        
+        'organization_price',
         'isActive'
     ];
     public function outletTokens()
