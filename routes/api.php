@@ -1,11 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailController;
-use App\Http\Controllers\TokenController;
 use App\Http\Controllers\SMSController;
+use App\Http\Controllers\TokenController;
+use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
 
 
 /*
@@ -35,6 +37,7 @@ Route::post('/issue-token-api', [TokenController::class, 'issueTokenAPI'])->name
 
 
 
+
 Route::get('/token-history/{id}', [TokenController::class, 'getTokenHistoryByID']);
 
 Route::post('/send-sms', [SMSController::class, 'sendSMS']);
@@ -48,3 +51,9 @@ Route::post('/logout', function () {
     auth()->logout();
     return redirect()->route('login');
 })->name('logout');
+
+
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+
+Route::put('/user/update', [UserController::class, 'update'])->name('user.update');

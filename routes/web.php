@@ -39,6 +39,10 @@ Route::get('/home', [UserController::class, 'home_view'])->name('home');
 Route::get('/aboutus', [UserController::class, 'aboutus_view'])->name('aboutus');
 Route::get('/contactus', [UserController::class, 'countacus_view'])->name('contactus');
 Route::get('/token-view', [TokenController::class, 'tokenView'])->name('tokenview');
+Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::get('/editprofile',[UserController::class,'editprofile'])->name('editprofile');
+Route::get('/view-status',[UserController::class, 'viewstatus'])->name('viewstatus');
 // Route group for USER role
 Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function () {});
 
@@ -77,6 +81,9 @@ Route::middleware(['auth:web'])->group(function () {
             Route::get('/Token', action: [TokenController::class, 'adminIndex'])->name('Token.adminIndex');
 
             Route::get('/tokenHistoryList/{id}', [CustomerController::class, 'TokenHistory'])->name('tokenHistoryList');
+
+
+           
 
         });
 
