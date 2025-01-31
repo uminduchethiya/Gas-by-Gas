@@ -42,4 +42,8 @@ class Token extends Model
     {
         return $this->belongsTo(outlet::class);
     }
+    public function cylinderType()
+{
+    return $this->belongsTo(GasCylinder::class, 'cylinder_type_id');
+}
 }
