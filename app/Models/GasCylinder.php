@@ -16,6 +16,7 @@ class GasCylinder extends Model
         'description', 
         'size', 
         'user_price',
+        
         'organization_price',
         'isActive'
     ];
