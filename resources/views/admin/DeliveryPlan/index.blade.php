@@ -1,9 +1,9 @@
 @extends('admin.layout')
 
 @section('content')
-<div class="container mx-auto p-5">
-    <h2 class="text-2xl text-white font-bold mb-5">Gas Cylinders</h2>
-
+<main class="flex-1 p-6 overflow-auto">
+<h1 class="text-2xl font-bold text-text-white">Manage Delivery Plan</h1>
+    <div class="mt-6 bg-white rounded-lg shadow-md p-6">
         <div class="mb-4">
             <form action="{{ route('admin.DeliveryPlan.index') }}" method="GET" id="filterForm"
                 class="flex items-center space-x-4">
@@ -216,7 +216,8 @@
         </div>
     </div>
 
-</div>
+
+</main>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
