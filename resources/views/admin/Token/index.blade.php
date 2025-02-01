@@ -2,6 +2,8 @@
 
 @section('content')
 <main class="flex-1 p-6 overflow-auto">
+<h1 class="text-2xl font-bold text-text-white">Token Report</h1>
+
     <div class="mt-6 bg-white rounded-lg shadow-md p-6">
         <div class="mb-4">
             <form action="{{ route('admin.Token.adminIndex') }}" method="GET" id="filterForm"

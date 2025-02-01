@@ -7,9 +7,9 @@
         <a href="{{ route('admin.OutletTokens.index') }}" class="block hover:bg-accent-1 p-2 rounded">Outlet Token
             Management</a>
         <a href="{{ route('admin.DeliveryPlan.index') }}" class="block hover:bg-accent-1 p-2 rounded">Delivery Plan</a>
-        <a href="{{ route('admin.stock.adminIndex') }}" class="block hover:bg-accent-1 p-2 rounded">Monitor Stocks </a>
+        <a href="{{ route('admin.stock.adminIndex') }}" class="block hover:bg-accent-1 p-2 rounded">Stock Reports </a>
 
-        <a href="{{ route('admin.Token.adminIndex') }}" class="block hover:bg-accent-1 p-2 rounded">Monitor Tokens </a>
+        <a href="{{ route('admin.Token.adminIndex') }}" class="block hover:bg-accent-1 p-2 rounded">Token Reports </a>
         
     </ul>
 </div>

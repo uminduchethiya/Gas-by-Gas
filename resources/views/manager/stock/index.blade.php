@@ -2,7 +2,7 @@
 
 @section('content')
 <main class="flex-1 p-6 overflow-auto">
-    <!-- Stock Management Table -->
+<h1 class="text-2xl font-bold text-text-white">Monitor Stocks</h1>
     <div class="mt-6 bg-white rounded-lg shadow-md p-6">
         <div class="mb-4">
             <form action="{{ route('manager.stock.index') }}" method="GET" id="filterForm"

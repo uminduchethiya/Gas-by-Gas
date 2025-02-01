@@ -12,7 +12,7 @@
             </div>
             <!-- Card 2 -->
             <div class="bg-accent-2 text-white rounded-lg p-4">
-                <h3 class="text-lg font-bold">Active Sessions</h3>
+                <h3 class="text-lg font-bold">Active Tokens</h3>
                 <p class="text-2xl">45</p>
             </div>
             <!-- Card 3 -->
