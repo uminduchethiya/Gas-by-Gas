@@ -1,9 +1,9 @@
 @extends('admin.layout')
 
 @section('content')
-<div class="container mx-auto p-5">
-    <h2 class="text-2xl text-white font-bold mb-5">Gas Cylinders</h2>
-
+<main class="flex-1 p-6 overflow-auto">
+<h1 class="text-2xl font-bold text-text-white">Manage Gas cylinders</h1>
+    <div class="mt-6 bg-white rounded-lg shadow-md p-6">
     <!-- Add Button -->
     <div class="flex justify-between mb-3">
         <button onclick="openModal()" class="bg-green-700 text-white px-4 py-2 rounded">Add Gas Cylinder</button>
@@ -12,30 +12,31 @@
 
 
     <!-- Gas Cylinder Table -->
-    <table class="w-full border-collapse border border-gray-200 bg-white text-black">
-        <thead>
+    <table class="w-full text-sm text-left text-gray-500 mt-6">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+
             <tr class="bg-gray-300 text-black">
-                <th class="border p-2">#</th>
-                <th class="border p-2">Name</th>
-                <th class="border p-2">Description</th>
-                <th class="border p-2">Size</th>
-                <th class="border p-2">User Price</th>
-                <th class="border p-2">Organization Price</th>
-                <th class="border p-2">Active</th>
-                <th class="border p-2">Actions</th>
+                <th class="px-4 py-2">#</th>
+                <th class="px-4 py-2">Name</th>
+                <th class="px-4 py-2">Description</th>
+                <th class="px-4 py-2">Size</th>
+                <th class="px-4 py-2">User Price</th>
+                <th class="px-4 py-2">Organization Price</th>
+                <th class="px-4 py-2">Active</th>
+                <th class="px-4 py-2">Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach($gasCylinders as $cylinder)
             <tr class="bg-white text-black">
-                <td class="border p-2">{{ $loop->iteration }}</td>
-                <td class="border p-2">{{ $cylinder->name }}</td>
-                <td class="border p-2">{{ $cylinder->description }}</td>
-                <td class="border p-2">{{ $cylinder->size }}</td>
-                <td class="border p-2">{{ $cylinder->user_price }}</td>
-                <td class="border p-2">{{ $cylinder->organization_price }}</td>
-                <td class="border p-2">{{ $cylinder->isActive ? 'Yes' : 'No' }}</td>
-                <td class="border p-2">
+                <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                <td class="px-4 py-2">{{ $cylinder->name }}</td>
+                <td class="px-4 py-2">{{ $cylinder->description }}</td>
+                <td class="px-4 py-2">{{ $cylinder->size }}</td>
+                <td class="px-4 py-2">{{ $cylinder->user_price }}</td>
+                <td class="px-4 py-2">{{ $cylinder->organization_price }}</td>
+                <td class="px-4 py-2">{{ $cylinder->isActive ? 'Yes' : 'No' }}</td>
+                <td class="px-4 py-2">
                     <button onclick="editCylinder({{ $cylinder->id }})" class="bg-blue-600 text-black px-2 py-1 rounded">Edit</button>
                     <form action="{{ route('gas-cylinders.destroy', $cylinder->id) }}" method="POST" class="inline">
                         @csrf
@@ -48,6 +49,7 @@
         </tbody>
     </table>
 </div>
+</main>
 
 <!-- Modal -->
 <div id="modal" class="hidden fixed inset-0 bg-gray-700 bg-opacity-50 flex items-center justify-center">
