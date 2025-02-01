@@ -10,6 +10,6 @@
         <a href="{{ route('admin.stock.adminIndex') }}" class="block hover:bg-accent-1 p-2 rounded">Monitor Stocks </a>
 
         <a href="{{ route('admin.Token.adminIndex') }}" class="block hover:bg-accent-1 p-2 rounded">Monitor Tokens </a>
-        
+        <a href="{{ route('admin.gascylinderview') }}"class="block hover:bg-accent-1 p-2 rounded">Manage Gas Cylinder</a>
     </ul>
 </div>
