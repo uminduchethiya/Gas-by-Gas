@@ -11,5 +11,7 @@
 
         <a href="{{ route('admin.Token.adminIndex') }}" class="block hover:bg-accent-1 p-2 rounded">Token Reports </a>
         
+
+        <a href="{{ route('admin.gascylinderview') }}"class="block hover:bg-accent-1 p-2 rounded">Manage Gas Cylinder</a>
     </ul>
 </div>

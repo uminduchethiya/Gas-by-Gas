@@ -3,6 +3,7 @@
 use App\Consts\UserRoleConst;
 use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\GasCylinderController;
 use App\Http\Controllers\ManagerDashboard;
 use App\Http\Controllers\OutletTokenController;
 use App\Http\Controllers\TokenController;
@@ -81,9 +82,10 @@ Route::middleware(['auth:web'])->group(function () {
             Route::get('/Token', action: [TokenController::class, 'adminIndex'])->name('Token.adminIndex');
 
             Route::get('/tokenHistoryList/{id}', [CustomerController::class, 'TokenHistory'])->name('tokenHistoryList');
+            Route::get('/gascylinder',[GasCylinderController::class,'index'])->name('gascylinderview');
 
 
-           
+
 
         });
 
