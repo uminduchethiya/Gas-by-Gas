@@ -1,6 +1,6 @@
 <!-- resources/views/admin/sidebar.blade.php -->
 <div class="bg-secondary-bg text-white w-64 h-screen p-4 shadow-lg">
-    <h2 class="text-2xl font-bold mb-4">Admin Panel</h2>
+    <h2 class="text-2xl font-bold mb-4">Manager Panel</h2>
     <ul class="space-y-3">
         <a href="{{ route('manager.dashboard') }}" class="block hover:bg-accent-1 p-2 rounded">Dashboard</a>
         <a href="{{ route('manager.customer.index') }}" class="block hover:bg-accent-1 p-2 rounded">customer

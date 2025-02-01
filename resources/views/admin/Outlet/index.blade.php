@@ -2,7 +2,7 @@
 
 @section('content')
 <main class="flex-1 p-6 overflow-auto">
-    <!-- Table Example -->
+    <h1 class="text-2xl font-bold text-text-white">Manage Outlets</h1>
     <div class="mt-6 bg-white rounded-lg shadow-md p-6">
         <div class="mb-4">
             <form action="{{ route('admin.Outlet.index') }}" method="GET" id="filterForm"

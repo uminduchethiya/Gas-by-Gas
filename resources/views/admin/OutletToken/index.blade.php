@@ -7,8 +7,8 @@
     }
 </style>
 <main class="flex-1 p-6 overflow-auto">
-    <!-- Table Example -->
-    <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+<h1 class="text-2xl font-bold text-text-white">Manage Outlet Tokens</h1>
+<div class="mt-6 bg-white rounded-lg shadow-md p-6">
         <div class="mb-4">
             <form action="{{ route('admin.OutletTokens.index') }}" method="GET" id="filterForm"
                 class="flex items-center space-x-4 w-full">
@@ -21,10 +21,10 @@
                 </div>
 
                 <!-- Button to trigger the modal, aligned to the right of the form -->
-                <button type="button" onclick="openModal()"
+                <!-- <button type="button" onclick="openModal()"
                     class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 ml-auto">
                     Add New
-                </button>
+                </button> -->
             </form>
         </div>
 
@@ -62,7 +62,7 @@
                     <th class="px-4 py-2">Max Tokens</th>
                     <th class="px-4 py-2">Current Tokens</th>
 
-                    <th class="px-4 py-2">Actions</th>
+                    <!-- <th class="px-4 py-2">Actions</th> -->
                 </tr>
             </thead>
 
@@ -76,7 +76,7 @@
                         <td class="px-4 py-2">{{ $outletToken->currentTokens }}</td>
 
 
-                        <td class="px-4 py-2">
+                        <!-- <td class="px-4 py-2">
                            
                             <button onclick="openModal('edit', {{ $outletToken }})"
                                 class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600">
@@ -86,7 +86,7 @@
                                 onclick="deleteOutlet({{ $outletToken->id }})">
                                 Delete
                             </button>
-                        </td>
+                        </td> -->
                     </tr>
                 @empty
                     <tr>
