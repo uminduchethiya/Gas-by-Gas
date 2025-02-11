@@ -63,3 +63,6 @@ Route::post('/store', [GasCylinderController::class, 'store'])->name('gas-cylind
 Route::get('/edit/{id}', [GasCylinderController::class, 'edit'])->name('gas-cylinders.edit');
 Route::put('/update/{id}', [GasCylinderController::class, 'update'])->name('gas-cylinders.update');
 Route::delete('/delete/{id}', [GasCylinderController::class, 'destroy'])->name('gas-cylinders.destroy');
+
+
+Route::post('/send-price-update', [GasCylinderController::class, 'sendPriceUpdate'])->name('send-price-update');

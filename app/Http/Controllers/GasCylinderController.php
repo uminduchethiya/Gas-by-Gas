@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Consts\UserRoleConst;
+use App\Http\Controllers\Controller;
+use App\Mail\GasCylinderPriceUpdate;
 use App\Models\GasCylinder;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class GasCylinderController extends Controller
 {
@@ -57,8 +62,40 @@ class GasCylinderController extends Controller
         $gasCylinder = GasCylinder::findOrFail($id);
         $gasCylinder->delete();
         return redirect()->route('admin.gascylinderview')->with('success', 'Gas Cylinder added successfully.');
-
     }
+
+
+    public function sendPriceUpdate()
+    {
+        // Get all gas cylinders
+        $gasCylinders = GasCylinder::all();
+    
+        // Get only users with USER or ORGANIZATION role
+        $users = User::whereIn('role_id', [UserRoleConst::USER, UserRoleConst::ORGANIZATION])->get();
+    
+        // Ensure there are valid users
+        if ($users->isEmpty()) {
+            return redirect()->back()->with('error', 'No eligible users found to send the email.');
+        }
+    
+        if ($gasCylinders->isEmpty()) {
+            return redirect()->back()->with('error', 'No gas cylinder data found.');
+        }
+    
+        // Send the email to only users with valid roles
+        foreach ($users as $user) {
+            $filteredCylinders = $gasCylinders->map(function ($cylinder) use ($user) {
+                return [
+                    'name' => $cylinder->name,
+                    'price' => ($user->role_id == UserRoleConst::USER) ? $cylinder->user_price : $cylinder->organization_price,
+                ];
+            });
+    
+            Mail::to($user->email)->send(new GasCylinderPriceUpdate($filteredCylinders, $user->role_id));
+        }
+    
+        return redirect()->back()->with('success', 'Price update sent to all eligible users.');
+    }
+    
+    
 }
-
-

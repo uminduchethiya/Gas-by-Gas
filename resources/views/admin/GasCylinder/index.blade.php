@@ -7,7 +7,10 @@
     <!-- Add Button -->
     <div class="flex justify-between mb-3">
         <button onclick="openModal()" class="bg-green-700 text-white px-4 py-2 rounded">Add Gas Cylinder</button>
-        <button class="bg-yellow-600 text-white px-4 py-2 rounded">Send Update Price</button>
+        <form action="{{ route('send-price-update') }}" method="POST" class="inline">
+            @csrf
+            <button type="submit" class="bg-yellow-600 text-white px-4 py-2 rounded">Send Update Price</button>
+        </form>
     </div>
 
 
