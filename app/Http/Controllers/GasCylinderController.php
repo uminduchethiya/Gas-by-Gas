@@ -26,7 +26,7 @@ class GasCylinderController extends Controller
         ]);
 
         GasCylinder::create($request->all());
-        return redirect()->route('gascylinderview')->with('success', 'Gas Cylinder added successfully.');
+        return redirect()->route('admin.gascylinderview')->with('success', 'Gas Cylinder added successfully.');
     }
 
     public function edit($id)
@@ -49,14 +49,15 @@ class GasCylinderController extends Controller
         $gasCylinder = GasCylinder::findOrFail($id);
         $gasCylinder->update($request->all());
 
-        return redirect()->route('gascylinderview')->with('success', 'Gas Cylinder updated successfully.');
+        return redirect()->route('admin.gascylinderview')->with('success', 'Gas Cylinder updated successfully.');
     }
 
     public function destroy($id)
     {
         $gasCylinder = GasCylinder::findOrFail($id);
         $gasCylinder->delete();
-        return redirect()->route('gascylinderview')->with('success', 'Gas Cylinder deleted successfully.');
+        return redirect()->route('admin.gascylinderview')->with('success', 'Gas Cylinder added successfully.');
+
     }
 }
 
