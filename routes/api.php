@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OutletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SMSController;
@@ -38,7 +39,6 @@ Route::post('/issue-token-api', [TokenController::class, 'issueTokenAPI'])->name
 
 
 
-
 Route::get('/token-history/{id}', [TokenController::class, 'getTokenHistoryByID']);
 
 Route::post('/send-sms', [SMSController::class, 'sendSMS']);
@@ -65,4 +65,18 @@ Route::put('/update/{id}', [GasCylinderController::class, 'update'])->name('gas-
 Route::delete('/delete/{id}', [GasCylinderController::class, 'destroy'])->name('gas-cylinders.destroy');
 
 
+
+
+
+Route::post('/MobileLogin', [AuthController::class, 'apiLogin'])->name('login.MobileLogin');
+Route::post('/MobileRegistration', [AuthController::class, 'APIregister'])->name('MobileRegistration.MobileRegistration');
+Route::get('/GetAllOutlets', [OutletController::class, 'GetAllOutlets'])->name('GetAllOutlets.GetAllOutlets');
+Route::get('/GetAllGasCylinders', [GasCylinderController::class, 'GetAllGasCylinders'])->name('GetAllGasCylinders.GetAllGasCylinders');
+Route::get('/Customertokens/{userId}', [TokenController::class, 'Customertokens'])->name('GetAllGasCylinders.Customertokens');
+
+
+
+
+
 Route::post('/send-price-update', [GasCylinderController::class, 'sendPriceUpdate'])->name('send-price-update');
+

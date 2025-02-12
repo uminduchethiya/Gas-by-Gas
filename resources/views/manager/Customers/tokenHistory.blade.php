@@ -206,10 +206,4 @@
 
 </script>
 
-<script>
-
-
-</script>
-
-
 @endsection

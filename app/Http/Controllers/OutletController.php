@@ -78,14 +78,12 @@ class OutletController extends Controller
 
         ]);
     }
-
-
     public function store(Request $request)
     {
         try {
             DB::beginTransaction(); // Start transaction
 
-            $validated =  Validator::make($request->all(), [
+            $validated = Validator::make($request->all(), [
                 'branch_id' => 'required|exists:branches,id',
                 'Name' => 'required|string|max:255',
                 'Address' => 'required|string',
@@ -200,4 +198,10 @@ class OutletController extends Controller
         }
     }
 
+    public function GetAllOutlets(Request $request)
+    {
+        $outlets = Outlet::where('isActive', true)->get(); 
+    
+        return response()->json($outlets); 
+    }
 }

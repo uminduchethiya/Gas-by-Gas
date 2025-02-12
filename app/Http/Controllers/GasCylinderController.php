@@ -65,6 +65,14 @@ class GasCylinderController extends Controller
     }
 
 
+    public function GetAllGasCylinders(Request $request)
+    {
+        $outlets = GasCylinder::where('isActive', true)->get(); 
+    
+        return response()->json($outlets); 
+    }
+
+
     public function sendPriceUpdate()
     {
         // Get all gas cylinders

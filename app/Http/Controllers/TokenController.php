@@ -475,7 +475,7 @@ class TokenController extends Controller
         $loggedInUserRole = auth()->user()->role_id ?? null;
         $assignedOutletId = auth()->user()->outlet_id;
         $assignedStatus = auth()->user()->role_id;
-        return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId', 'assignedStatus','loggedInUserRole'));
+        return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId', 'assignedStatus', 'loggedInUserRole'));
     }
 
     public function assignNewUserToToken(Request $request, TwilioSmsService $smsService)
@@ -557,4 +557,35 @@ class TokenController extends Controller
             ], 500);
         }
     }
+
+    public function TokenHistory(Request $request, $tokenid)
+    {
+
+        $tokenHistory = TokenHistory::where('token_id', $tokenid)->get();
+
+        if ($tokenHistory->isEmpty()) {
+            return response()->json(['message' => 'No token history found.'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'tokenHistory' => $tokenHistory
+        ]);
+
+    }
+    public function Customertokens(Request $request, $userId)
+    {
+        $tokens = Token::select(
+            'tokens.id',
+            'tokens.status',
+            'gas_cylinders.name as cylinder_name'
+        )
+            ->leftJoin('gas_cylinders', 'tokens.cylinder_type_id', '=', 'gas_cylinders.id')
+            ->where('tokens.user_id', '=', $userId)
+            ->orderByRaw("CASE WHEN tokens.status = 'pending' THEN 0 ELSE 1 END, tokens.id ASC") // Order by status then ID
+            ->get();
+    
+        return response()->json($tokens);
+    }
+
 }

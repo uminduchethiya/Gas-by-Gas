@@ -26,6 +26,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+
     public function login(Request $request)
     {
         try {
@@ -235,7 +236,8 @@ class AuthController extends Controller
         }
     }
 
-    public function showForgotPasswordForm(){
+    public function showForgotPasswordForm()
+    {
         return view('auth.forgotpassword');
     }
 
@@ -266,8 +268,9 @@ class AuthController extends Controller
         return back()->with('status', 'Password reset link has been sent to your email.');
     }
 
-    public function showResetPasswordForm($token){
-        return view('auth.resetpassword',compact('token'));
+    public function showResetPasswordForm($token)
+    {
+        return view('auth.resetpassword', compact('token'));
     }
 
     public function resetPassword(Request $request)
@@ -294,5 +297,104 @@ class AuthController extends Controller
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return redirect()->route('login')->with('status', 'Your password has been reset successfully.');
+    }
+
+    public function apiLogin(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string|min:8',
+            ]);
+
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                $user = Auth::user();
+
+                // Check if the user's status is active
+                if ($user->status !== 'active') {
+                    Auth::logout();
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Your account is not active. Please contact the admin.'
+                    ], 403);
+                }
+
+                $token = $user->createToken('authToken')->plainTextToken;
+
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Login successful',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $user->role_id,
+                        'token' => $token,
+                    ]
+                ];
+
+                return response()->json($response, 200);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid credentials. Please try again.'
+            ], 401);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred during login. Please try again.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+    }
+
+    public function APIregister(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+                'contact_number' => [
+                    'required',
+                    'regex:/^\+94\d{9}$/',
+                ],
+                'address' => 'nullable|string',
+                'nic' => [
+                    'required',
+                    'regex:/^\d{12}$|^\d{9}[vVxX]$/',
+                    'unique:users'
+                ],
+                'outlet' => 'required|exists:outlets,id'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'contact_number' => $request->contact_number,
+                'address' => $request->address,
+                'nic' => $request->nic,
+                'role_id' => UserRoleConst::USER,
+                'outlet_id' => $request->outlet,
+                'is_organization' => false,
+                'status' => 'active',
+            ]);
+
+            $token = $user->createToken('api-token')->plainTextToken;
+            return response()->json(['success' => 'User registered successfully!', 'token' => $token, 'user' => $user]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
