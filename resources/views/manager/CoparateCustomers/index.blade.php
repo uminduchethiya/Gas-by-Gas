@@ -290,14 +290,14 @@
             const data = await response.json();
 
             if (response.ok) {
-                alert(data.message || 'Token status updated successfully!');
+                alert(data.message || 'update Customer request successfully!');
                 closeModal();
                 location.reload();
             } else {
-                alert(data.error || 'Failed to update token status.');
+                alert(data.error || 'Failed to update Customer request.');
             }
         } catch (error) {
-            alert('An error occurred while updating the token status.');
+            alert('An error occurred while updating  Customer request.');
         }
     }
 

@@ -20,6 +20,15 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Services\TwilioSmsService;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendTokenCreationNotification;
+use App\Mail\SendTokenStatusChangeNotification;
+use App\Mail\SendTokenExtendEmail;
+use App\Mail\TokenReassignedToUser;
+use App\Mail\NewTokenAssigned;
+
+use Carbon\Carbon;
+
 
 class TokenController extends Controller
 {
@@ -27,7 +36,7 @@ class TokenController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $status = $request->input('status', 'pending');
+        $status = $request->input('status');
         $isActive = $request->input('isActive');
         $sortBy = $request->input('sort_by', 'expires_at');
         $sortDirection = $request->input('sort_direction', 'desc');
@@ -190,6 +199,18 @@ class TokenController extends Controller
                 $userContactNumber,
                 $message
             );
+
+
+            Mail::to($user->email)->send(new SendTokenStatusChangeNotification(
+                $user,
+                $token->id,
+                $token->token_code,
+                $request->status,
+                $request->reason ?? null
+
+            ));
+
+
             if (!$smsResponse['success']) {
                 throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
             }
@@ -314,6 +335,18 @@ class TokenController extends Controller
                 $userContactNumber,
                 $message
             );
+            $user = User::where('id', $userId)->first();
+            $GasCylinder = GasCylinder::where('id', $cylinderTypeId)->first();
+
+
+            Mail::to($user->email)->send(new SendTokenCreationNotification(
+                $user,
+                $token->id,
+                $GasCylinder->name,
+                $GasCylinder->user_price,
+                $expiresAt,
+                $quantity
+            ));
 
             if (!$smsResponse['success']) {
                 throw new \Exception('Failed to send SMS: ' . $smsResponse['error']);
@@ -429,6 +462,19 @@ class TokenController extends Controller
                 $userContactNumber,
                 $message
             );
+            $user = User::where('id', $userId)->first();
+            $GasCylinder = GasCylinder::where('id', $cylinderTypeId)->first();
+
+
+            Mail::to($user->email)->send(new SendTokenCreationNotification(
+                $user,
+                $token->id,
+                $GasCylinder->name,
+                $GasCylinder->user_price,
+                $expiresAt,
+                $quantity
+            ));
+
             DB::commit();
             return response()->json([
                 'success' => true,
@@ -534,7 +580,6 @@ class TokenController extends Controller
                 $originalUserContactNumber = $countryCode . ltrim($originalUserContactNumber, '0');
             }
 
-            DB::commit();
 
             $originalUserContactNumber = "Dear {$originalUserName}, your token assing to new user. Please contact outlet for more details.";
             $smsResponse = $smsService->sendSms($originalUserContactNumber, $originalUserContactNumber);
@@ -543,11 +588,21 @@ class TokenController extends Controller
             $smsResponse = $smsService->sendSms($userContactNumber, $message);
 
 
+            $loginUrl = url('/login'); // Update this URL if needed
+
+            // Send email to the original user (Token reassigned)
+            Mail::to($originalUser->email)->send(new TokenReassignedToUser($originalUser, $token->id,$loginUrl));
+
+            // Send email to the new user (New token assigned)
+            Mail::to($newUser->email)->send(new NewTokenAssigned($newUser, $token->id));
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'User reassigned successfully and SMS notification sent.',
             ]);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -584,8 +639,40 @@ class TokenController extends Controller
             ->where('tokens.user_id', '=', $userId)
             ->orderByRaw("CASE WHEN tokens.status = 'pending' THEN 0 ELSE 1 END, tokens.id ASC") // Order by status then ID
             ->get();
-    
+
         return response()->json($tokens);
     }
 
+    public function extendTokensExpiration()
+    {
+        $tokens = Token::where('status', 'pending')
+            ->whereBetween('expires_at', [Carbon::now()->subDay(), Carbon::now()->addDay()])
+            ->with('user')
+            ->get();
+        if ($tokens->isEmpty()) {
+            return response()->json(['message' => 'No tokens to extend.']);
+        }
+
+        foreach ($tokens as $token) {
+            $expireDate = Carbon::parse($token->expires_at);
+
+            $newExpirationDate = $expireDate->addWeeks(2);
+
+            $token->expires_at = $newExpirationDate;
+            $token->save();
+
+            $loginUrl = url('/login'); // Update this URL based on your login route
+            $user = $token->user;
+
+            if ($user) {
+                $loginUrl = url('/login'); // Update this URL if needed
+                Mail::to($user->email)->send(new SendTokenExtendEmail($user, $loginUrl, $newExpirationDate));
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tokens extended.',
+        ]);
+    }
 }

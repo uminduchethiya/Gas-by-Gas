@@ -36,6 +36,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.api');
 Route::post('/issue-token', [TokenController::class, 'issueToken'])->name('api.issueToken');
 Route::post('/issue-token-api', [TokenController::class, 'issueTokenAPI'])->name('api.issueTokenAPI');
 
+Route::get('/extendTokensExpiration', [TokenController::class, 'extendTokensExpiration'])->name('api.extendTokensExpiration');
 
 
 

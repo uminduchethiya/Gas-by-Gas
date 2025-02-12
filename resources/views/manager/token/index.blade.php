@@ -36,6 +36,12 @@
                         Create Token
                     </button>
                 </div>
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="extendExpireDate()"
+                        class="px-4 py-1 bg-green-500 text-white rounded-md hover:bg-green-600">
+                        Extend Expire Date
+                    </button>
+                </div>
             </form>
         </div>
 
@@ -82,27 +88,21 @@
                             @endif
                         </a>
                     </th>
-                    <th class="px-4 py-2">
-                        Quantity
-                    </th>
+                    <th class="px-4 py-2">Quantity</th>
                     <th class="px-4 py-2">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($tokens as $token)
-                                <tr class=" @php
+                                <tr class="@php
                                     $expireDate = \Carbon\Carbon::parse($token->expires_at);
                                     $now = \Carbon\Carbon::now();
                                     $daysLeft = $expireDate->diffInDays($now);
 
-                                    if ($token->status === 'canceled') {
-                                        echo 'bg-red-300';
-                                    } elseif ($token->status === 'completed') {
-                                        echo 'bg-green-200';
-                                    } elseif ($daysLeft == 1) {
-                                        echo 'bg-yellow-200';
+                                    if ($daysLeft <= 2) {
+                                        echo 'bg-red-100';  // Mark as red if expires in 2 days
                                     } else {
-                                        echo 'bg-white';
+                                        echo 'bg-white';  // Default background for other cases
                                     }
                                 @endphp ">
                                     <td class="px-4 py-2">{{ $token->id }}</td>
@@ -115,19 +115,21 @@
 
                                     <td class="px-4 py-2">
                                         <!-- Disable button if status is 'complete' or 'canceled' -->
-                                        <button onclick="openModal({{ $token }})"
-                                            class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
-                                            @if(in_array($token->status, ['complete', 'canceled'])) disabled @endif>
+                                        <button onclick="openModal({{ $token }})" class="px-3 py-1 rounded-md hover:bg-blue-600 
+                                    @if($token->status === 'canceled') text-red-500 border border-red-500 
+                                    @else bg-blue-500 text-white @endif" @if(in_array($token->status, ['complete', 'canceled']))
+                                    disabled @endif>
                                             Update Status
                                         </button>
-                                        <button onclick="openModalReasign({{ $token }})"
-                                            class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
-                                            @if(in_array($token->status, ['complete', 'canceled'])) disabled @endif>
+                                        <!-- Enable Reassign Token button only if status is 'pending' or 'scheduled' -->
+                                        <button onclick="openModalReasign({{ $token }})" class="px-3 py-1 rounded-md hover:bg-blue-600 
+                                    @if($token->status === 'canceled') text-red-500 border border-red-500 
+                                    @else bg-blue-500 text-white @endif" @if(!in_array($token->status, ['pending', 'scheduled']))
+                                    disabled @endif>
                                             Reassign Token
                                         </button>
                                     </td>
                                 </tr>
-
                 @empty
                     <tr>
                         <td colspan="7" class="text-center px-4 py-2">No tokens found.</td>
@@ -221,7 +223,11 @@
             </tbody>
         </table>
         <!-- Header Section -->
+        <div class="mb-4 mt-4">
+            <label for="updateStatus" class="block font-medium text-gray-700 mb-1">Number Of cylinder</label>
+            <label for="updateStatus" id="numberOFcilinders" class="block font-medium text-gray-700 mb-1">=</label>
 
+        </div>
 
 
         <div class="mb-4 mt-4">
@@ -333,10 +339,23 @@
 </div>
 
 
+<div id="pageLoader"
+    class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-50 hidden z-50">
+    <div class="flex flex-col items-center">
+        <svg class="animate-spin h-10 w-10 text-white" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0"></path>
+        </svg>
+        <p class="text-white mt-2">Loading...</p>
+    </div>
+</div>
 
 
 
 <script>
+
+
     document.addEventListener("DOMContentLoaded", function () {
         const userSelect = document.getElementById("tokenUser");
         const gasQtyInput = document.getElementById("GasQty");
@@ -401,6 +420,8 @@
     }
 
     function assignNewUser() {
+        $("#pageLoader").removeClass("hidden");
+
         const currentUserId = document.getElementById('currentUserId').value;
         const newUserId = document.getElementById('newTokenUser').value;
         const tokenId = document.getElementById('modalTokenIdReassign').innerText;
@@ -432,12 +453,15 @@
                 tokenId: tokenId
             }),
             success: function (response) {
+                $("#pageLoader").addClass("hidden");
+
                 if (response.success) {
                     alert(response.message);
                     window.location.reload();
                 }
             },
             error: function (xhr) {
+                $("#pageLoader").addClass("hidden");
 
                 var errors = xhr.responseJSON.errors;
                 console.log(errors);
@@ -464,7 +488,7 @@
     }
 
     function openModalReasign(token) {
-        console.log(token);
+
         currentTokenId = token.id;
 
         document.getElementById('currentUserName').innerText = token.user_name;
@@ -483,16 +507,22 @@
 
 
     function openModal(token) {
+        $("#pageLoader").removeClass("hidden");
+
+
         currentTokenId = token.id;
         document.getElementById('modalTokenId').innerText = token.id;
         document.getElementById('updateStatus').value = token.status;
 
+        document.getElementById('numberOFcilinders').innerHTML = token.quantity;
 
         $.ajax({
             url: '/api/token-history/' + token.id, // Adjust with the correct route
             method: 'GET',
             success: function (response) {
                 if (response.success) {
+                    $("#pageLoader").addClass("hidden");
+
 
                     const historyContainer = document.getElementById('history-tbody');
                     historyContainer.innerHTML = ''; // Clear previous history
@@ -509,6 +539,8 @@
                     });
 
                 } else {
+                    $("#pageLoader").addClass("hidden");
+
                     alert(response.message); // No history found
                 }
             },
@@ -534,6 +566,8 @@
     }
 
     async function updateTokenStatus() {
+        $("#pageLoader").removeClass("hidden");
+
         const status = document.getElementById('updateStatus').value;
         const comment = document.getElementById('updateComment').value.trim();
         const tokenId = document.getElementById('modalTokenId').innerText;
@@ -559,13 +593,19 @@
             const data = await response.json();
 
             if (response.ok) {
+                $("#pageLoader").addClass("hidden");
+
                 alert(data.message || 'Token status updated successfully!');
                 closeModal();
                 location.reload();
             } else {
+                $("#pageLoader").addClass("hidden");
+
                 alert(data.error || 'Failed to update token status.');
             }
         } catch (error) {
+            $("#pageLoader").addClass("hidden");
+
             alert('An error occurred while updating the token status.');
         }
     }
@@ -573,9 +613,13 @@
 
     function closeModal() {
         document.getElementById('tokenModal').classList.add('hidden');
+        document.getElementById('tokenREassignModal').classList.add('hidden');
+
     }
 
     function createToken() {
+        $("#pageLoader").removeClass("hidden");
+
         const userOutlet = document.getElementById('userOutlet').value;
         const tokenUser = document.getElementById('tokenUser').value;
         const gasCylinderType = document.getElementById('gasCylinderType').value;
@@ -627,12 +671,16 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
+                $("#pageLoader").addClass("hidden");
+
                 if (response.success) {
                     alert(response.message);
                     window.location.reload();
                 }
             },
             error: function (xhr) {
+                $("#pageLoader").addClass("hidden");
+
                 var errors = xhr.responseJSON.errors;
                 if (errors) {
                     for (var field in errors) {
@@ -646,7 +694,41 @@
             }
         });
     }
+    function extendExpireDate() {
+        $("#pageLoader").removeClass("hidden");
 
+        $.ajax({
+            url: "/api/extendTokensExpiration",
+            type: "GET",
+
+            contentType: "application/json",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                $("#pageLoader").addClass("hidden");
+
+                if (response.success) {
+                    alert(response.message);
+                    window.location.reload();
+                }
+            },
+            error: function (xhr) {
+                $("#pageLoader").addClass("hidden");
+
+                var errors = xhr.responseJSON.errors;
+                if (errors) {
+                    for (var field in errors) {
+                        var errorMessage = errors[field].join(', ');
+                        $('#' + field).next('.error-message').remove(); // Remove previous error messages
+                        $('#' + field).after('<div class="error-message text-red-500">' + errorMessage + '</div>');
+                    }
+                } else {
+                    alert(xhr.responseJSON.error || 'An unexpected error occurred');
+                }
+            }
+        });
+    }
 </script>
 <script>
     document.getElementById('statusSelect').addEventListener('change', function () {
