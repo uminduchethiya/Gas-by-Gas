@@ -7,8 +7,8 @@
     <title>GAS BY GAS USER REGISTER</title>
     @vite('resources/css/app.css')
     <!-- Include SweetAlert2 CSS and JS -->
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Background Gradient Animation */
         body {
@@ -52,7 +52,9 @@
         }
     </style>
 </head>
-@if (session('status') == 'error')
+
+<body class="flex items-center justify-center min-h-screen bg-main-bg font-mono">
+    @if (session('status') == 'error')
     <script>
         Swal.fire({
             icon: 'error',
@@ -69,8 +71,7 @@
         });
     </script>
 @endif
-<body class="flex items-center justify-center min-h-screen bg-main-bg font-mono">
-    
+
     <!-- Login Container -->
     <div
         class="w-full max-w-md p-8 space-y-6 bg-secondary-bg rounded-lg shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105">
@@ -188,35 +189,6 @@
                     fileContainer.classList.toggle('hidden', !checkbox.checked);
                 }
             </script>
-           <script>
-            document.querySelector('.animated-form').addEventListener('submit', function (e) {
-                const nic = document.getElementById('nic').value.trim();
-                const contactNumber = document.getElementById('contact-number').value.trim();
-        
-                const nicRegex = /^\d{12}$|^\d{9}[vVxX]$/; // NIC validation
-                const phoneRegex = /^\+94\d{9}$/; // Phone number validation
-        
-                if (!nicRegex.test(nic)) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Invalid NIC Format',
-                        text: 'Please enter a valid NIC. Use 12 digits for the new NIC or 9 digits followed by V/v or X/x for the old NIC.',
-                    });
-                    return;
-                }
-        
-                if (!phoneRegex.test(contactNumber)) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Invalid Phone Number Format',
-                        text: 'Please enter a valid phone number. It should start with +94 followed by 9 digits.',
-                    });
-                    return;
-                }
-            });
-        </script>
         </form>
         <!-- Forgot Password Link -->
         <div class="text-center">

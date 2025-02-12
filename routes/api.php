@@ -67,6 +67,7 @@ Route::delete('/delete/{id}', [GasCylinderController::class, 'destroy'])->name('
 
 
 
+
 Route::post('/MobileLogin', [AuthController::class, 'apiLogin'])->name('login.MobileLogin');
 Route::post('/MobileRegistration', [AuthController::class, 'APIregister'])->name('MobileRegistration.MobileRegistration');
 Route::get('/GetAllOutlets', [OutletController::class, 'GetAllOutlets'])->name('GetAllOutlets.GetAllOutlets');
@@ -75,4 +76,7 @@ Route::get('/Customertokens/{userId}', [TokenController::class, 'Customertokens'
 
 
 
+
+
+Route::post('/send-price-update', [GasCylinderController::class, 'sendPriceUpdate'])->name('send-price-update');
 
