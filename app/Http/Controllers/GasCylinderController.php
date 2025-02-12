@@ -58,6 +58,13 @@ class GasCylinderController extends Controller
         $gasCylinder->delete();
         return redirect()->route('gascylinderview')->with('success', 'Gas Cylinder deleted successfully.');
     }
+
+    public function GetAllGasCylinders(Request $request)
+    {
+        $outlets = GasCylinder::where('isActive', true)->get(); 
+    
+        return response()->json($outlets); 
+    }
 }
 
 
