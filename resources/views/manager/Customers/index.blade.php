@@ -76,7 +76,7 @@
                     <div>
                         <label for="contact-number" class="block text-sm font-medium text-text-secondary">Contact
                             Number</label>
-                        <input type="tel" id="contact-number" name="contact_number" required
+                        <input type="tel" id="contact_number" name="contact_number" required
                             class="w-full px-3 py-2 border rounded-md" placeholder="Enter your contact number">
                     </div>
 
@@ -101,7 +101,7 @@
                         <label for="verification-file"
                             class="block text-sm font-medium text-text-secondary">Verification
                             File</label>
-                        <input type="file" id="verification-file" name="verification_file"
+                        <input type="file" id="verification_file" name="verification_file"
                             class="w-full px-3 py-2 border rounded-md">
                     </div>
 

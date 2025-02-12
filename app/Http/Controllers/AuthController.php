@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Mail\UserRegistration;
+use App\Mail\CoparateRegistration;
+
 
 class AuthController extends Controller
 {
@@ -97,7 +100,8 @@ class AuthController extends Controller
                 'address' => 'nullable|string',
                 'nic' => [
                     'required',
-                    'regex:/^\d{12}$|^\d{9}[vVxX]$/', // New NIC (12 digits) or Old NIC (9 digits followed by V/v or X/x)
+                    'regex:/^\d{12}$|^\d{9}[vVxX]$/',
+                    'unique:users'
                 ],
                 'outlet' => 'required|exists:outlets,id',
                 'is_organization' => 'sometimes|boolean',
@@ -135,6 +139,12 @@ class AuthController extends Controller
                 'status' => $isOrganization ? 'deactive' : 'active', // Set status to 'deactive' for organizations
             ]);
 
+            if (!$isOrganization) {
+                Mail::to($user->email)->send(new UserRegistration($user, url('/login-view')));
+            } else {
+                Mail::to($user->email)->send(new CoparateRegistration($user, url('/login-view')));
+
+            }
 
             return redirect()->route('login')
                 ->with('status', 'success')
@@ -155,9 +165,16 @@ class AuthController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8|confirmed',
-                'contact_number' => 'nullable|string',
+                'contact_number' => [
+                    'required',
+                    'regex:/^\+94\d{9}$/', // Must start with +94 followed by 9 digits
+                ],
                 'address' => 'nullable|string',
-                'nic' => 'nullable|string|unique:users',
+                'nic' => [
+                    'required',
+                    'regex:/^\d{12}$|^\d{9}[vVxX]$/',
+                    'unique:users'
+                ],
                 'outlet' => 'required|exists:outlets,id',
                 'is_organization' => 'sometimes|boolean',
                 'verification_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048|required_if:is_organization,true',
@@ -185,6 +202,15 @@ class AuthController extends Controller
                 'verification_file' => $verificationFilePath,
                 'status' => $isOrganization ? 'deactive' : 'active',
             ]);
+
+            if (!$isOrganization) {
+                Mail::to($user->email)->send(new UserRegistration($user, url('/login-view')));
+            } else {
+                Mail::to($user->email)->send(new CoparateRegistration($user, url('/login-view')));
+
+            }
+
+
 
             return response()->json(['success' => 'Customer created successfully!']);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -389,6 +415,9 @@ class AuthController extends Controller
             ]);
 
             $token = $user->createToken('api-token')->plainTextToken;
+
+            Mail::to($user->email)->send(new UserRegistration($user, url('/login-view')));
+
             return response()->json(['success' => 'User registered successfully!', 'token' => $token, 'user' => $user]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
