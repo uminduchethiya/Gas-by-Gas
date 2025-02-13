@@ -36,27 +36,23 @@ class GasCylinderController extends Controller
 
     public function edit($id)
     {
-        $gasCylinder = GasCylinder::findOrFail($id);
-        return response()->json($gasCylinder);
+        $cylinder = GasCylinder::findOrFail($id);
+        return response()->json($cylinder);
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'size' => 'required|numeric',
-            'user_price' => 'required|numeric',
-            'organization_price' => 'required|numeric',
-            'isActive' => 'boolean'
-        ]);
-
-        $gasCylinder = GasCylinder::findOrFail($id);
-        $gasCylinder->update($request->all());
-
-        return redirect()->route('admin.gascylinderview')->with('success', 'Gas Cylinder updated successfully.');
+        $cylinder = GasCylinder::find($id);
+        
+        if (!$cylinder) {
+            return redirect()->route('admin.gascylinderview')->with('error', 'Gas Cylinder not found');
+        }
+    
+        $cylinder->update($request->all());
+    
+        return redirect()->route('admin.gascylinderview')->with('success', 'Gas Cylinder updated successfully');
     }
-
+    
     public function destroy($id)
     {
         $gasCylinder = GasCylinder::findOrFail($id);
@@ -67,9 +63,9 @@ class GasCylinderController extends Controller
 
     public function GetAllGasCylinders(Request $request)
     {
-        $outlets = GasCylinder::where('isActive', true)->get(); 
-    
-        return response()->json($outlets); 
+        $outlets = GasCylinder::where('isActive', true)->get();
+
+        return response()->json($outlets);
     }
 
 
@@ -77,19 +73,19 @@ class GasCylinderController extends Controller
     {
         // Get all gas cylinders
         $gasCylinders = GasCylinder::all();
-    
+
         // Get only users with USER or ORGANIZATION role
         $users = User::whereIn('role_id', [UserRoleConst::USER, UserRoleConst::ORGANIZATION])->get();
-    
+
         // Ensure there are valid users
         if ($users->isEmpty()) {
             return redirect()->back()->with('error', 'No eligible users found to send the email.');
         }
-    
+
         if ($gasCylinders->isEmpty()) {
             return redirect()->back()->with('error', 'No gas cylinder data found.');
         }
-    
+
         // Send the email to only users with valid roles
         foreach ($users as $user) {
             $filteredCylinders = $gasCylinders->map(function ($cylinder) use ($user) {
@@ -98,12 +94,10 @@ class GasCylinderController extends Controller
                     'price' => ($user->role_id == UserRoleConst::USER) ? $cylinder->user_price : $cylinder->organization_price,
                 ];
             });
-    
+
             Mail::to($user->email)->send(new GasCylinderPriceUpdate($filteredCylinders, $user->role_id));
         }
-    
+
         return redirect()->back()->with('success', 'Price update sent to all eligible users.');
     }
-    
-    
 }

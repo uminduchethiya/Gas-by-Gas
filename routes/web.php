@@ -42,8 +42,8 @@ Route::get('/contactus', [UserController::class, 'countacus_view'])->name('conta
 Route::get('/token-view', [TokenController::class, 'tokenView'])->name('tokenview');
 Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
-Route::get('/editprofile',[UserController::class,'editprofile'])->name('editprofile');
-Route::get('/view-status',[UserController::class, 'viewstatus'])->name('viewstatus');
+Route::get('/editprofile', [UserController::class, 'editprofile'])->name('editprofile');
+Route::get('/view-status', [UserController::class, 'viewstatus'])->name('viewstatus');
 // Route group for USER role
 Route::middleware(['auth:web', 'role:' . UserRoleConst::USER])->group(function () {});
 
@@ -82,11 +82,10 @@ Route::middleware(['auth:web'])->group(function () {
             Route::get('/Token', action: [TokenController::class, 'adminIndex'])->name('Token.adminIndex');
 
             Route::get('/tokenHistoryList/{id}', [CustomerController::class, 'TokenHistory'])->name('tokenHistoryList');
-            Route::get('/gascylinder',[GasCylinderController::class,'index'])->name('gascylinderview');
+            Route::get('/gascylinder', [GasCylinderController::class, 'index'])->name('gascylinderview');
 
-
-
-
+            Route::get('/gas-cylinders/{id}/edit', [GasCylinderController::class, 'edit'])->name('gas-cylinders.edit');
+            Route::post('/gas-cylinders/{id}', [GasCylinderController::class, 'update'])->name('gas-cylinders.update');
         });
 
     // Manager Dashboard route
