@@ -61,8 +61,8 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('
 Route::put('/user/update', [UserController::class, 'update'])->name('user.update');
 
 Route::post('/store', [GasCylinderController::class, 'store'])->name('gas-cylinders.store');
-Route::get('/edit/{id}', [GasCylinderController::class, 'edit'])->name('gas-cylinders.edit');
-Route::put('/update/{id}', [GasCylinderController::class, 'update'])->name('gas-cylinders.update');
+// Route::get('/edit/{id}', [GasCylinderController::class, 'edit'])->name('gas-cylinders.edit');
+// Route::put('/update/{id}', [GasCylinderController::class, 'update'])->name('gas-cylinders.update');
 Route::delete('/delete/{id}', [GasCylinderController::class, 'destroy'])->name('gas-cylinders.destroy');
 
 
