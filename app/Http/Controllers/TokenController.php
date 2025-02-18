@@ -630,6 +630,7 @@ class TokenController extends Controller
     }
     public function Customertokens(Request $request, $userId)
     {
+        
         $tokens = Token::select(
             'tokens.id',
             'tokens.status',
@@ -639,7 +640,6 @@ class TokenController extends Controller
             ->where('tokens.user_id', '=', $userId)
             ->orderByRaw("CASE WHEN tokens.status = 'pending' THEN 0 ELSE 1 END, tokens.id ASC") // Order by status then ID
             ->get();
-
         return response()->json($tokens);
     }
 
