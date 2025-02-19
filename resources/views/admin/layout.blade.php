@@ -52,8 +52,8 @@
             </button>
             <form id="logoutForm" action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="bg-red-600 px-4 py-2 rounded text-white hover:bg-red-700 transition">
-                    Logout
+                <button type="submit" class="px-4 py-2 rounded text-white transition">
+                    <img src="{{ asset('images/logout.png') }}" alt="Logout" class="w-8 h-8"> <!-- Adjust size as needed -->
                 </button>
             </form>
         </header>
@@ -81,7 +81,7 @@
                 }
             }).then(response => {
                 if (response.ok) {
-                    window.location.href = "/register-view"; // Redirect to login page
+                    window.location.href = "/login-view"; // Redirect to login page
                 }
             }).catch(error => console.error('Logout failed', error));
         });
