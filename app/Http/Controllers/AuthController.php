@@ -71,11 +71,10 @@ class AuthController extends Controller
                 'email' => 'These credentials do not match our records.',
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred during login. Please try again.',
-                'error' => $e->getMessage(),
-            ], 500);
+            // Handle any exceptions
+            return redirect()->back()
+                ->with('status', 'error')
+                ->with('message', 'An error occurred during login. Please try again.');
         }
     }
 

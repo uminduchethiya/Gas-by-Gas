@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAS BY GAS USER LOGIN</title>
     @vite('resources/css/app.css')
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Background Gradient Animation */
         body {
@@ -51,6 +53,15 @@
 </head>
 
 <body class="flex items-center justify-center min-h-screen bg-main-bg font-mono">
+    @if ($errors->any())
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '{{ $errors->first() }}', // Display the first error message
+            });
+        </script>
+    @endif
     <!-- Login Container -->
     <div
         class="w-full max-w-md p-8 space-y-6 bg-secondary-bg rounded-lg shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105">
@@ -62,13 +73,13 @@
 
         <!-- Login Form -->
         <form method="POST" action="{{ route('login.api') }}" class="space-y-4 animated-form">
-            @csrf 
+            @csrf
             <!-- Email Input -->
             <div>
                 <label for="email" class="block text-sm font-medium text-text-secondary">Email Address</label>
                 <input type="email" id="email" name="email" required value="{{ old('email') }}"
-                class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg"
-                placeholder="admin@gmail.com">
+                    class="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent border-accent-2 text-text-white bg-main-bg"
+                    placeholder="admin@gmail.com">
                 @error('email')
                     <!-- Display error message for email field -->
                     <span class="text-sm text-red-500">{{ $message }}</span>

@@ -46,11 +46,22 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="bg-secondary-bg text-text-white p-4 shadow-md flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Welcome, Manager</h1>
+
+            <h1 class="text-2xl font-bold">Welcome, Admin</h1>
             <div>
                 <span class="text-sm">Logged in as: {{ Auth::user()->name }}</span>
             </div>
+            <button id="toggleSidebar1" class="text-white text-2xl focus:outline-none">
+                ☰
+            </button>
+            <form id="logoutForm" action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="px-4 py-2 rounded text-white transition">
+                    <img src="{{ asset('images/logout.png') }}" alt="Logout" class="w-8 h-8"> <!-- Adjust size as needed -->
+                </button>
+            </form>
         </header>
+
 
       
 
@@ -64,6 +75,22 @@
             <p>&copy; 2024 Gas By Gas. All rights reserved.</p>
         </footer>
     </div>
+    <script>
+        document.getElementById('logoutForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent normal form submission
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = "/login-view"; // Redirect to login page
+                }
+            }).catch(error => console.error('Logout failed', error));
+        });
+    </script>
 </body>
 
 </html>
