@@ -17,4 +17,23 @@
         <a href="{{ route('manager.stock.index') }}" class="block hover:bg-accent-1 p-2 rounded">stock</a>
 
     </ul>
+    
 </div>
+<script>
+    $(document).ready(function() {
+        $("#toggleSidebar1").click(function() {
+            $("#sidebar1").toggleClass("-translate-x-full hidden");
+            $("#mainContent1").toggleClass("w-full");
+        });
+    });
+</script>
+
+<style>
+    #sidebar1 {
+        transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+    }
+
+    .-translate-x-full {
+        transform: translateX(-100%);
+    }
+</style>

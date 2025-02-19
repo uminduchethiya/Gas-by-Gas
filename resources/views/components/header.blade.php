@@ -11,7 +11,7 @@
             <a href="/aboutus" class="text-black hover:text-primaryColor">About</a>
             <a href="/token-view" class="text-black hover:text-primaryColor">Token Request</a>
             <a href="/contactus" class="text-black hover:text-primaryColor">Contact</a>
-           
+
         </div>
 
         <!-- Profile and Cart Dropdown -->
@@ -27,7 +27,7 @@
                             d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                 </button>
-            
+
                 <!-- Dropdown Menu -->
                 <div id="dropdown-menu"
                     class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
@@ -37,22 +37,23 @@
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Sign
                                 Up</a>
                         @endguest
-            
+
                         @auth
                             <a href="/editprofile"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Edit
                                 Profile</a>
-            
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                                    @csrf
-                                </form>
-                            <button type="button" onclick="logout()"
-                                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Logout</button>
+
+                                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Logout</a>
+                            
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                                @csrf
+                            </form>
                         @endauth
                     </div>
                 </div>
             </div>
-          
+
 
             @auth
                 <h1 class="ml-2">Hi, {{ Auth::user()->name }}</h1>
@@ -110,22 +111,10 @@
     mobileMenuOverlay.addEventListener('click', closeMenu);
 </script>
 
+
 <script>
     function toggleDropdown() {
         const menu = document.getElementById('dropdown-menu');
         menu.classList.toggle('hidden');
     }
-
-    function logout() {
-    // Optional: Clear any user data stored in localStorage or sessionStorage
-    localStorage.clear();
-    sessionStorage.clear();
-
-    // Submit the logout form
-    document.getElementById('logout-form').submit();
-
-    // Redirect to the login page after form submission
-    window.location.href = "/login-view";
-}
-
 </script>

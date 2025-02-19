@@ -17,9 +17,9 @@ class UserController extends Controller
         $outlets = Outlet::all();
         $user = auth()->user();
         $gasCylinders = GasCylinder::where('isActive', true)->get();
-        $loggedInUserId = auth()->id();
-        $assignedOutletId = auth()->user()->outlet_id;
-        $assignedStatus = auth()->user()->role_id;
+        $loggedInUserId = auth()->id() ?? null;
+        $assignedOutletId = auth()->user()->outlet_id ?? null;
+        $assignedStatus = auth()->user()->role_id ?? null;
         $loggedInUserRole = auth()->user()->role_id ?? null;
         return view('user.home', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId', 'assignedStatus', 'loggedInUserRole'));
     }

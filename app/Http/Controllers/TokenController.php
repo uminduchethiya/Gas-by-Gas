@@ -225,6 +225,9 @@ class TokenController extends Controller
     // duplicated logic used for differnt perpose retun types diffent if u do any changes to on please apply to other 
     public function issueToken(Request $request, TwilioSmsService $smsService)
     {
+        if(!auth()->check()){
+            return redirect()->route('login')->with('error','you must be logged in to issues');
+        }
         $userId = $request->input('user_id');
 
         // Fetch the user role to validate the cylinder quantity conditionally
@@ -517,10 +520,10 @@ class TokenController extends Controller
 
         $gasCylinders = GasCylinder::where('isActive', true)->get();
 
-        $loggedInUserId = auth()->id();
+        $loggedInUserId = auth()->id() ?? null;
         $loggedInUserRole = auth()->user()->role_id ?? null;
-        $assignedOutletId = auth()->user()->outlet_id;
-        $assignedStatus = auth()->user()->role_id;
+        $assignedOutletId = auth()->user()->outlet_id ?? null;
+        $assignedStatus = auth()->user()->role_id ?? null;
         return view('user.tokenrequest', compact('outlets', 'assignedOutletId', 'gasCylinders', 'loggedInUserId', 'assignedStatus', 'loggedInUserRole'));
     }
 
